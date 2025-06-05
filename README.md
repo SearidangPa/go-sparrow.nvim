@@ -1,7 +1,7 @@
 # go-sparrow
 
 <div align="center">
-  <img src="go-sparrow.png" alt="go-sparrow">
+  <img src="go-sparrow.png" alt="go-sparrow" width="200">
 </div>
 
 A Neovim plugin that provides enhanced navigation for Go files using treesitter. Fly inside the code tree fast like a sparrow!
