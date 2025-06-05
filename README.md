@@ -6,6 +6,8 @@
 
 A Neovim plugin that provides enhanced navigation for Go files using treesitter. Fly inside the code tree fast like a sparrow!
 
+While plugin that uses label-based navigation such as flash.nvim is great, sometimes i get tired of the label. I don't want to see and react to the label.
+
 ## Features
 
 - **Function Declaration Navigation** - Jump between function and method declarations
