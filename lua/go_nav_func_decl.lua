@@ -95,24 +95,47 @@ local function move_to_next_func_decl_start()
 end
 
 local function prev_func_decl_start(root, query, cursor_row, cursor_col)
+  local top_line, bottom_line = get_visible_range()
   local previous_node = nil
-  for _, node, _, _ in query:iter_captures(root, 0, 0, -1) do
+  
+  -- First search in visible range
+  for _, node, _, _ in query:iter_captures(root, 0, top_line, bottom_line) do
     if node then
-      if not previous_node then
-        previous_node = node
-      end
-
       local s_row, s_col, _ = node:start()
-      if s_row > cursor_row or (s_row == cursor_row and s_col >= cursor_col) then
-        break
-      end
-
-      local prev_s_row, _, _ = previous_node:start()
-      if s_row > prev_s_row then
-        previous_node = node
+      if s_row < cursor_row or (s_row == cursor_row and s_col < cursor_col) then
+        if not previous_node then
+          previous_node = node
+        else
+          local prev_s_row, _, _ = previous_node:start()
+          if s_row > prev_s_row then
+            previous_node = node
+          end
+        end
       end
     end
   end
+  
+  if previous_node then
+    return previous_node
+  end
+  
+  -- Fallback to full search from beginning to cursor
+  for _, node, _, _ in query:iter_captures(root, 0, 0, cursor_row) do
+    if node then
+      local s_row, s_col, _ = node:start()
+      if s_row < cursor_row or (s_row == cursor_row and s_col < cursor_col) then
+        if not previous_node then
+          previous_node = node
+        else
+          local prev_s_row, _, _ = previous_node:start()
+          if s_row > prev_s_row then
+            previous_node = node
+          end
+        end
+      end
+    end
+  end
+  
   return previous_node
 end
 

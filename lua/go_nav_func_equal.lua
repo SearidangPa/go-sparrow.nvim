@@ -49,6 +49,13 @@ local function get_parser_and_query()
   return parser, query, root, buf_nr
 end
 
+local function get_visible_range()
+  local win = vim.api.nvim_get_current_win()
+  local top_line = vim.fn.line('w0', win) - 1  -- 0-indexed
+  local bottom_line = vim.fn.line('w$', win) - 1  -- 0-indexed
+  return top_line, bottom_line
+end
+
 local function get_cached_matches()
   local buf_nr = vim.api.nvim_get_current_buf()
   local changedtick = vim.api.nvim_buf_get_changedtick(buf_nr)
@@ -59,8 +66,10 @@ local function get_cached_matches()
 
   local _, query, root = get_parser_and_query()
   local matches = {}
+  local top_line, bottom_line = get_visible_range()
 
-  for id, node, _ in query:iter_captures(root, buf_nr, 0, -1) do
+  -- First get matches in visible range
+  for id, node, _ in query:iter_captures(root, buf_nr, top_line, bottom_line) do
     local capture_name = query.captures[id]
     if capture_name == 'func_name' then
       local func_name = vim.treesitter.get_node_text(node, buf_nr)
@@ -72,6 +81,28 @@ local function get_cached_matches()
           col = start_col,
           name = func_name,
         })
+      end
+    end
+  end
+
+  -- If we need more matches, expand search
+  if #matches < 10 then  -- arbitrary threshold
+    for id, node, _ in query:iter_captures(root, buf_nr, 0, -1) do
+      local capture_name = query.captures[id]
+      if capture_name == 'func_name' then
+        local start_row, start_col = node:range()
+        -- Skip if already in visible range
+        if start_row < top_line or start_row > bottom_line then
+          local func_name = vim.treesitter.get_node_text(node, buf_nr)
+          if not ignore_list[func_name] then
+            table.insert(matches, {
+              node = node,
+              row = start_row,
+              col = start_col,
+              name = func_name,
+            })
+          end
+        end
       end
     end
   end
