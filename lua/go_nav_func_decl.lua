@@ -95,9 +95,9 @@ local function move_to_next_func_decl_start()
 end
 
 local function prev_func_decl_start(root, query, cursor_row, cursor_col)
-  local top_line, bottom_line = get_visible_range()
+  local top_line, bottom_line = require('util_range').get_visible_range()
   local previous_node = nil
-  
+
   -- First search in visible range
   for _, node, _, _ in query:iter_captures(root, 0, top_line, bottom_line) do
     if node then
@@ -114,11 +114,11 @@ local function prev_func_decl_start(root, query, cursor_row, cursor_col)
       end
     end
   end
-  
+
   if previous_node then
     return previous_node
   end
-  
+
   -- Fallback to full search from beginning to cursor
   for _, node, _, _ in query:iter_captures(root, 0, 0, cursor_row) do
     if node then
@@ -135,7 +135,7 @@ local function prev_func_decl_start(root, query, cursor_row, cursor_col)
       end
     end
   end
-  
+
   return previous_node
 end
 

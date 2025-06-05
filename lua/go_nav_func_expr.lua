@@ -63,15 +63,8 @@ local function ignore(node)
   return false
 end
 
-local function get_visible_range()
-  local win = vim.api.nvim_get_current_win()
-  local top_line = vim.fn.line('w0', win) - 1 -- 0-indexed
-  local bottom_line = vim.fn.line('w$', win) - 1 -- 0-indexed
-  return top_line, bottom_line
-end
-
 local function find_previous_expr_statement(node, row, col)
-  local top_line, bottom_line = get_visible_range()
+  local top_line, bottom_line = require('util_range').get_visible_range()
   local previous_node = nil
 
   local function search_in_range(n, start_row, end_row)
@@ -123,7 +116,7 @@ local function find_previous_expr_statement(node, row, col)
 end
 
 local function find_next_expr_statement(node, row, col)
-  local top_line, bottom_line = get_visible_range()
+  local top_line, bottom_line = require('util_range').get_visible_range()
 
   local function search_in_range(n, start_row, end_row)
     for child in n:iter_children() do
