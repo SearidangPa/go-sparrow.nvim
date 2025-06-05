@@ -65,8 +65,8 @@ end
 
 local function get_visible_range()
   local win = vim.api.nvim_get_current_win()
-  local top_line = vim.fn.line('w0', win) - 1  -- 0-indexed
-  local bottom_line = vim.fn.line('w$', win) - 1  -- 0-indexed
+  local top_line = vim.fn.line('w0', win) - 1 -- 0-indexed
+  local bottom_line = vim.fn.line('w$', win) - 1 -- 0-indexed
   return top_line, bottom_line
 end
 
@@ -77,12 +77,12 @@ local function find_previous_expr_statement(node, row, col)
   local function search_in_range(n, start_row, end_row)
     for child in n:iter_children() do
       local child_start, _, child_end, _ = child:range()
-      
+
       -- Skip nodes completely outside our range
       if child_end < start_row or child_start > end_row then
         goto continue
       end
-      
+
       search_in_range(child, start_row, end_row)
 
       local candidate = false
@@ -105,18 +105,18 @@ local function find_previous_expr_statement(node, row, col)
           end
         end
       end
-      
+
       ::continue::
     end
   end
 
   -- First search in visible range
   search_in_range(node, top_line, bottom_line)
-  
+
   if previous_node then
     return previous_node
   end
-  
+
   -- Fallback to full search from beginning to cursor
   search_in_range(node, 0, row)
   return previous_node
@@ -124,16 +124,16 @@ end
 
 local function find_next_expr_statement(node, row, col)
   local top_line, bottom_line = get_visible_range()
-  
+
   local function search_in_range(n, start_row, end_row)
     for child in n:iter_children() do
       local child_start, _, child_end, _ = child:range()
-      
+
       -- Skip nodes completely outside our range
       if child_end < start_row or child_start > end_row then
         goto continue
       end
-      
+
       local candidate = nil
 
       if child:type() == 'field_identifier' and select_call_expr_statement(child) then
@@ -155,18 +155,18 @@ local function find_next_expr_statement(node, row, col)
       if descendant then
         return descendant
       end
-      
+
       ::continue::
     end
     return nil
   end
-  
+
   -- First search in visible range
   local result = search_in_range(node, top_line, bottom_line)
   if result then
     return result
   end
-  
+
   -- Fallback to full search from cursor to end
   return search_in_range(node, row, math.huge)
 end
