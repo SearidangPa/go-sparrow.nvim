@@ -18,7 +18,7 @@ A Neovim plugin that provides enhanced navigation for Go files using treesitter.
 
 ```lua
 {
-  'your-username/go-sparrow',
+  'SearidangPa/go-sparrow',
   ft = 'go',
   lazy = true,
   opts = {},
@@ -29,7 +29,7 @@ A Neovim plugin that provides enhanced navigation for Go files using treesitter.
 
 ```lua
 {
-  'your-username/go-sparrow',
+  'SearidangPa/go-sparrow',
   ft = 'go',
   config = function()
     require('go-sparrow').setup({
@@ -53,7 +53,7 @@ A Neovim plugin that provides enhanced navigation for Go files using treesitter.
 
 ```lua
 {
-  'your-username/go-sparrow',
+  'SearidangPa/go-sparrow',
   ft = 'go',
   config = function()
     local sparrow = require('go-sparrow')
