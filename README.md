@@ -20,9 +20,8 @@ A Neovim plugin that provides enhanced navigation for Go files using treesitter.
 {
   'your-username/go-sparrow',
   ft = 'go',
-  config = function()
-    require('go-sparrow').setup()
-  end,
+  lazy = true,
+  opts = {},
 }
 ```
 
