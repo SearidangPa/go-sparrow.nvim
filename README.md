@@ -10,7 +10,7 @@ A Neovim plugin that provides enhanced navigation for Go files using treesitter.
 - **Smart Filtering** - Ignore common logging functions during navigation
 - **Count Support** - Use count prefixes to jump multiple items at once
 - **Caching System** - Optimized performance for repeated navigation
-- **Repeat Motion** - Repeat last navigation command
+- **Unified Repeat Motion** - Repeat last navigation command across all navigation types
 
 ## Installation
 
@@ -43,7 +43,7 @@ A Neovim plugin that provides enhanced navigation for Go files using treesitter.
       prev_expression_statement = '[e',
       next_function_call = ']f',
       prev_function_call = '[f',
-      repeat_function_call_motion = '\\',
+      repeat_last_motion = '\\',
     })
   end,
 }
@@ -68,7 +68,7 @@ A Neovim plugin that provides enhanced navigation for Go files using treesitter.
     vim.keymap.set('n', '<leader>ep', sparrow.prev_expression_statement, { desc = 'Previous expression' })
     vim.keymap.set('n', '<leader>cn', sparrow.next_function_call, { desc = 'Next function call' })
     vim.keymap.set('n', '<leader>cp', sparrow.prev_function_call, { desc = 'Previous function call' })
-    vim.keymap.set('n', '<leader>cr', sparrow.repeat_function_call_motion, { desc = 'Repeat last motion' })
+    vim.keymap.set('n', '<leader>cr', sparrow.repeat_last_motion, { desc = 'Repeat last motion' })
   end,
 }
 ```
@@ -83,13 +83,18 @@ A Neovim plugin that provides enhanced navigation for Go files using treesitter.
 | `[e` | Previous expression statement |
 | `]f` | Next function call with assignment |
 | `[f` | Previous function call with assignment |
-| `\` | Repeat last function call motion |
+| `\` | Repeat last motion (any navigation type) |
 
 ## Usage
 
 All navigation commands support count prefixes:
 - `3]m` - Jump to the 3rd next function declaration
 - `2[e` - Jump to the 2nd previous expression statement
+
+The repeat motion feature works across all navigation types:
+- Use any navigation command (`]m`, `[e`, `]f`, etc.)
+- Then press `\` to repeat the same motion and direction
+- The repeat command remembers which navigation type and direction was used last
 
 ## API
 
@@ -102,7 +107,7 @@ sparrow.next_expression_statement()
 sparrow.prev_expression_statement()
 sparrow.next_function_call()
 sparrow.prev_function_call()
-sparrow.repeat_function_call_motion()
+sparrow.repeat_last_motion()
 ```
 
 ## Requirements

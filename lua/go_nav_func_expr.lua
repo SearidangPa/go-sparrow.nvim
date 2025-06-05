@@ -169,6 +169,7 @@ local function move_to_next_expr_statement()
   if count == 0 then
     count = 1
   end
+  require('repeat_motion').set_last_motion('expression_statement', 'next', count)
   local root = get_root_node()
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
@@ -187,6 +188,7 @@ local function move_to_previous_expr_statement()
   if count == 0 then
     count = 1
   end
+  require('repeat_motion').set_last_motion('expression_statement', 'previous', count)
   local root = get_root_node()
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)

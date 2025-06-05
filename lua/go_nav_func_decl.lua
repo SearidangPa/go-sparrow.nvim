@@ -80,6 +80,7 @@ local function move_to_next_func_decl_start()
   if count == 0 then
     count = 1
   end
+  require('repeat_motion').set_last_motion('function_declaration', 'next', count)
   local root, query = get_root_node { is_func_start = true }
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
@@ -144,6 +145,7 @@ local function move_to_prev_func_decl_start()
   if count == 0 then
     count = 1
   end
+  require('repeat_motion').set_last_motion('function_declaration', 'previous', count)
   local root, query = get_root_node { is_func_start = true }
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
