@@ -64,7 +64,7 @@ local function ignore(node)
 end
 
 local function find_previous_expr_statement(node, row, col)
-  local top_line, bottom_line = require('util_range').get_visible_range()
+  local top_line, bottom_line = require('go-sparrow.util_range').get_visible_range()
   local previous_node = nil
 
   local function search_in_range(n, start_row, end_row)
@@ -116,7 +116,7 @@ local function find_previous_expr_statement(node, row, col)
 end
 
 local function find_next_expr_statement(node, row, col)
-  local top_line, bottom_line = require('util_range').get_visible_range()
+  local top_line, bottom_line = require('go-sparrow.util_range').get_visible_range()
 
   local function search_in_range(n, start_row, end_row)
     for child in n:iter_children() do
@@ -169,7 +169,7 @@ local function move_to_next_expr_statement()
   if count == 0 then
     count = 1
   end
-  require('repeat_motion').set_last_motion('expression_statement', 'next', count)
+  require('go-sparrow.repeat_motion').set_last_motion('expression_statement', 'next', count)
   local root = get_root_node()
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
@@ -188,7 +188,7 @@ local function move_to_previous_expr_statement()
   if count == 0 then
     count = 1
   end
-  require('repeat_motion').set_last_motion('expression_statement', 'previous', count)
+  require('go-sparrow.repeat_motion').set_last_motion('expression_statement', 'previous', count)
   local root = get_root_node()
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)

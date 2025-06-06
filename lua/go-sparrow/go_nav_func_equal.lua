@@ -10,7 +10,6 @@ local cache = {
   matches = nil,
 }
 
-
 local query_string = [[
 ;; Function calls in short variable declarations (e.g., result, err := func())
 (short_var_declaration
@@ -58,7 +57,7 @@ local function get_cached_matches()
 
   local _, query, root = get_parser_and_query()
   local matches = {}
-  local top_line, bottom_line = require('util_range').get_visible_range()
+  local top_line, bottom_line = require('go-sparrow.util_range').get_visible_range()
 
   -- First get matches in visible range
   for id, node, _ in query:iter_captures(root, buf_nr, top_line, bottom_line) do
@@ -147,7 +146,7 @@ local function move_to_next_func_call()
   if count == 0 then
     count = 1
   end
-  require('repeat_motion').set_last_motion('function_call_with_equal', 'next', count)
+  require('go-sparrow.repeat_motion').set_last_motion('function_call_with_equal', 'next', count)
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
@@ -165,7 +164,7 @@ local function move_to_previous_func_call()
   if count == 0 then
     count = 1
   end
-  require('repeat_motion').set_last_motion('function_call_with_equal', 'previous', count)
+  require('go-sparrow.repeat_motion').set_last_motion('function_call_with_equal', 'previous', count)
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
@@ -177,7 +176,6 @@ local function move_to_previous_func_call()
     end
   end
 end
-
 
 function M.get_prev_func_call_with_equal()
   local cursor_pos = vim.api.nvim_win_get_cursor(0)

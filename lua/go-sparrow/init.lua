@@ -1,9 +1,9 @@
 local M = {}
 
-local func_decl = require 'go_nav_func_decl'
-local func_expr = require 'go_nav_func_expr'
-local func_equal = require 'go_nav_func_equal'
-local repeat_motion = require 'repeat_motion'
+local func_decl = require 'go-sparrow.go_nav_func_decl'
+local func_expr = require 'go-sparrow.go_nav_func_expr'
+local func_equal = require 'go-sparrow.go_nav_func_equal'
+local repeat_motion = require 'go-sparrow.repeat_motion'
 
 M.next_function_declaration = func_decl.next_function_declaration
 M.prev_function_declaration = func_decl.prev_function_declaration
