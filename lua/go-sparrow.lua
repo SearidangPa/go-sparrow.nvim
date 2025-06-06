@@ -18,9 +18,9 @@ function M.repeat_last_motion()
   if not repeat_motion.has_last_motion() then
     return
   end
-  
-  local motion_type, direction, count = repeat_motion.get_last_motion()
-  
+
+  local motion_type, direction, _ = repeat_motion.get_last_motion()
+
   if motion_type == 'function_declaration' then
     if direction == 'next' then
       func_decl.next_function_declaration()
@@ -76,12 +76,7 @@ function M.setup(opts)
 
     vim.keymap.set('n', opts.next_function_call or ']f', M.next_function_call, vim.tbl_extend('force', keymap_opts, { desc = 'Next function call' }))
     vim.keymap.set('n', opts.prev_function_call or '[f', M.prev_function_call, vim.tbl_extend('force', keymap_opts, { desc = 'Previous function call' }))
-    vim.keymap.set(
-      'n',
-      opts.repeat_last_motion or '\\',
-      M.repeat_last_motion,
-      vim.tbl_extend('force', keymap_opts, { desc = 'Repeat last motion' })
-    )
+    vim.keymap.set('n', opts.repeat_last_motion or '\\', M.repeat_last_motion, vim.tbl_extend('force', keymap_opts, { desc = 'Repeat last motion' }))
   end
 end
 
