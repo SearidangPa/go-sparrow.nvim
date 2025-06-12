@@ -19,6 +19,19 @@ local function get_root_node(opts)
       (function_declaration
         name: (identifier) @func_decl_start
       )
+      (function_declaration
+        name: (dot_index_expression
+          field: (identifier) @func_decl_start)
+      )
+      (assignment_statement
+        (variable_list
+          name: (dot_index_expression
+            field: (identifier) @func_decl_start)
+        )
+        (expression_list
+          value: (function_definition)
+        )
+      )
     ]]
       )
       return root, query
@@ -28,6 +41,19 @@ local function get_root_node(opts)
         [[
       (function_declaration
         name: (identifier) @func_decl_start
+      ) @func_decl_node
+      (function_declaration
+        name: (dot_index_expression
+          field: (identifier) @func_decl_start)
+      ) @func_decl_node
+      (assignment_statement
+        (variable_list
+          name: (dot_index_expression
+            field: (identifier) @func_decl_start)
+        )
+        (expression_list
+          value: (function_definition)
+        )
       ) @func_decl_node
     ]]
       )
