@@ -40,13 +40,11 @@ Each module uses treesitter queries to parse and navigate code structures:
 - Keybindings: `]f` (next), `[f` (previous)
 
 ### Unified Repeat Motion System  
-- Shared state module (`repeat_motion.lua`) tracks last function call for repeat functionality
-- Stores reference to the last navigation function that was executed
-- Single `\` keymap works regardless of which navigation type was used last
-- API functions: `set_last_function()`, `get_last_function()`, `clear_last_function()`, `has_last_function()`, `repeat_last_function()`
-- Keybinding: `\` (repeat last motion)
-
-All navigation modules now use the function-reference-based repeat system via `set_last_function()`.
+- Navigation modules reference a shared state module (`repeat_motion.lua`) for repeat functionality
+- Each navigation function calls `require('go-sparrow.repeat_motion').set_last_function()` to track the last executed function
+- **Note**: The repeat_motion.lua module is currently missing from the codebase but is referenced by all navigation modules
+- Expected API functions: `set_last_function()`, `get_last_function()`, `clear_last_function()`, `has_last_function()`, `repeat_last_function()`
+- Expected keybinding: `\` (repeat last motion)
 
 ### Utility Modules
 - `util_range.lua` provides `get_visible_range()` function to determine the currently visible lines in the window
@@ -56,9 +54,8 @@ All navigation modules now use the function-reference-based repeat system via `s
 ### Plugin Setup
 - `init.lua` provides the main plugin interface and setup function
 - Exports all navigation functions for external access
-- `setup()` function configures keybindings with customizable options
-- Default keybindings can be disabled by passing `keymaps = false` to setup
-- Individual keybindings can be customized via setup options
+- **Note**: The `setup()` function is currently empty and does not configure any keybindings
+- Users must manually set up keybindings to use the navigation functions
 
 ## Key Features
 
@@ -67,28 +64,32 @@ All navigation modules now use the function-reference-based repeat system via `s
 - Ignore lists to skip common utility functions during navigation
 - Count prefix support for all navigation commands (e.g., `3]m` to jump to the 3rd next function)
 - Caching system for performance optimization in function call navigation
-- Unified repeat motion functionality across all navigation types
+- Planned unified repeat motion functionality (repeat_motion.lua module needed)
 - Performance optimization via visible range prioritization
-- Configurable keybindings through setup function
 - Modular architecture with separate concerns for each navigation type
 
 ## Installation and Setup
 
+**Note**: The setup function is currently empty. Users must manually configure keybindings.
+
 ```lua
--- Basic setup with default keybindings
-require('go-sparrow').setup()
+-- Manual keymap setup required
+local go_sparrow = require('go-sparrow')
 
--- Custom keybindings
-require('go-sparrow').setup({
-  next_function_declaration = ']m',
-  prev_function_declaration = '[m',
-  next_expression_statement = ']e', 
-  prev_expression_statement = '[e',
-  next_function_call = ']f',
-  prev_function_call = '[f',
-  repeat_last_motion = '\\'
-})
+-- Function declaration navigation
+vim.keymap.set('n', ']m', go_sparrow.next_function_declaration, { desc = 'Next function declaration' })
+vim.keymap.set('n', '[m', go_sparrow.prev_function_declaration, { desc = 'Previous function declaration' })
 
--- Disable default keybindings
-require('go-sparrow').setup({ keymaps = false })
+-- Expression statement navigation
+vim.keymap.set('n', ']e', go_sparrow.next_expression_statement, { desc = 'Next expression statement' })
+vim.keymap.set('n', '[e', go_sparrow.prev_expression_statement, { desc = 'Previous expression statement' })
+
+-- Function call navigation
+vim.keymap.set('n', ']f', go_sparrow.next_function_call, { desc = 'Next function call' })
+vim.keymap.set('n', '[f', go_sparrow.prev_function_call, { desc = 'Previous function call' })
+
+-- Repeat motion (requires repeat_motion.lua module)
+-- vim.keymap.set('n', '\\', function() 
+--   require('go-sparrow.repeat_motion').repeat_last_function() 
+-- end, { desc = 'Repeat last motion' })
 ```
