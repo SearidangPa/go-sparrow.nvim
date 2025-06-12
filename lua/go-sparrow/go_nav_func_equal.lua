@@ -146,7 +146,7 @@ local function move_to_next_func_call()
   if count == 0 then
     count = 1
   end
-  require('go-sparrow.repeat_motion').set_last_motion('function_call_with_equal', 'next', count)
+  require('go-sparrow.repeat_motion').set_last_function(move_to_next_func_call)
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
@@ -164,7 +164,7 @@ local function move_to_previous_func_call()
   if count == 0 then
     count = 1
   end
-  require('go-sparrow.repeat_motion').set_last_motion('function_call_with_equal', 'previous', count)
+  require('go-sparrow.repeat_motion').set_last_function(move_to_previous_func_call)
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
