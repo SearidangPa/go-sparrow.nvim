@@ -8,12 +8,13 @@ go-sparrow is a Neovim plugin that provides enhanced navigation for Go and Lua f
 
 ## Architecture
 
-The plugin consists of four main navigation modules plus shared utility modules:
+The plugin consists of five main navigation modules plus shared utility modules:
 
 - `lua/go-sparrow/go_nav_func_decl.lua` - Navigation between function declarations using `]m`/`[m` keybindings
 - `lua/go-sparrow/go_nav_func_expr.lua` - Navigation between expression statements using `]e`/`[e` keybindings  
 - `lua/go-sparrow/go_nav_func_equal.lua` - Navigation between function calls with assignment/declaration using `]f`/`[f` keybindings
 - `lua/go-sparrow/go_nav_identifier.lua` - Navigation between identifiers in short variable declarations using `]i`/`[i` keybindings
+- `lua/go-sparrow/go_nav_if.lua` - Navigation between if statement consequence blocks using `]c`/`[c` keybindings
 - `lua/go-sparrow/util_range.lua` - Utility functions for determining visible buffer ranges
 - `lua/go-sparrow/init.lua` - Main module initialization and setup function
 
@@ -43,6 +44,12 @@ Each module uses treesitter queries to parse and navigate code structures:
 - Excludes "err" identifiers from navigation targets
 - Uses caching system for performance optimization
 - Keybindings: `]i` (next), `[i` (previous)
+
+### If Statement Consequence Navigation
+- Targets the consequence block (opening brace `{`) of if statements
+- Navigates to the start of the consequence block for quick access to if statement bodies
+- Uses visible range optimization for performance
+- Keybindings: `]c` (next), `[c` (previous)
 
 ### Unified Repeat Motion System  
 - **Note**: The repeat_motion.lua module is not currently implemented in the codebase
@@ -95,4 +102,8 @@ vim.keymap.set('n', '[f', go_sparrow.prev_function_call, { desc = 'Previous func
 -- Identifier navigation
 vim.keymap.set('n', ']i', go_sparrow.next_identifier, { desc = 'Next identifier' })
 vim.keymap.set('n', '[i', go_sparrow.prev_identifier, { desc = 'Previous identifier' })
+
+-- If statement consequence navigation
+vim.keymap.set('n', ']c', go_sparrow.next_if_consequence, { desc = 'Next if consequence' })
+vim.keymap.set('n', '[c', go_sparrow.prev_if_consequence, { desc = 'Previous if consequence' })
 
