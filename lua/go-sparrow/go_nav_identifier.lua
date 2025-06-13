@@ -46,7 +46,7 @@ local function get_cached_matches()
     if capture_name == 'identifier' then
       local identifier_text = vim.treesitter.get_node_text(node, buf_nr)
       -- Skip "err" identifiers
-      if identifier_text ~= "err" then
+      if identifier_text ~= 'err' then
         local start_row, start_col = node:range()
         table.insert(matches, {
           node = node,
@@ -64,7 +64,7 @@ local function get_cached_matches()
       if capture_name == 'identifier' then
         local identifier_text = vim.treesitter.get_node_text(node, buf_nr)
         -- Skip "err" identifiers
-        if identifier_text ~= "err" then
+        if identifier_text ~= 'err' then
           local start_row, start_col = node:range()
           -- Skip if already in visible range
           if start_row < top_line or start_row > bottom_line then
@@ -93,7 +93,7 @@ local function get_cached_matches()
   return matches
 end
 
-local function find_prev_identifier(row, col)
+local function find_prev_identifier(row)
   local matches = get_cached_matches()
   assert(matches, 'No matches found')
   local previous_match = nil
@@ -110,7 +110,7 @@ local function find_prev_identifier(row, col)
   return previous_match and previous_match.node or nil
 end
 
-local function find_next_identifier(row, col)
+local function find_next_identifier(row)
   local matches = get_cached_matches()
   assert(matches, 'No matches found')
 
@@ -132,7 +132,7 @@ local function move_to_next_identifier()
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
-    local next_node = find_next_identifier(current_row, current_col)
+    local next_node = find_next_identifier(current_row)
 
     if next_node then
       local start_row, start_col, _, _ = next_node:range()
@@ -148,8 +148,8 @@ local function move_to_previous_identifier()
   end
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
-    local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
-    local previous_node = find_prev_identifier(current_row, current_col)
+    local current_row = cursor_pos[1] - 1
+    local previous_node = find_prev_identifier(current_row)
 
     if previous_node then
       local start_row, start_col, _, _ = previous_node:range()
@@ -162,4 +162,3 @@ M.next_identifier = move_to_next_identifier
 M.prev_identifier = move_to_previous_identifier
 
 return M
-
