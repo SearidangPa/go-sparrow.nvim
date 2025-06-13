@@ -131,7 +131,7 @@ local function move_to_next_identifier()
   end
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
-    local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
+    local current_row = cursor_pos[1] - 1
     local next_node = find_next_identifier(current_row)
 
     if next_node then
