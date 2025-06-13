@@ -32,6 +32,16 @@ local query_string = [[
         (selector_expression
           field: (field_identifier) @func_name)
       ])))
+
+;; Function calls in if statement conditions (e.g., if !bytes.Equal(...))
+(if_statement
+  condition: (_
+    (call_expression
+      function: [
+        (identifier) @func_name
+        (selector_expression
+          field: (field_identifier) @func_name)
+      ])))
 ]]
 
 local function get_parser_and_query()

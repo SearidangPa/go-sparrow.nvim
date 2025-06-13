@@ -8,11 +8,12 @@ go-sparrow is a Neovim plugin that provides enhanced navigation for Go and Lua f
 
 ## Architecture
 
-The plugin consists of four main navigation modules plus shared utility modules:
+The plugin consists of five main navigation modules plus shared utility modules:
 
 - `lua/go-sparrow/go_nav_func_decl.lua` - Navigation between function declarations using `]m`/`[m` keybindings
 - `lua/go-sparrow/go_nav_func_expr.lua` - Navigation between expression statements using `]e`/`[e` keybindings  
 - `lua/go-sparrow/go_nav_func_equal.lua` - Navigation between function calls with assignment/declaration using `]f`/`[f` keybindings
+- `lua/go-sparrow/go_nav_identifier.lua` - Navigation between identifiers in short variable declarations using `]i`/`[i` keybindings
 - `lua/go-sparrow/util_range.lua` - Utility functions for determining visible buffer ranges
 - `lua/go-sparrow/init.lua` - Main module initialization and setup function
 
@@ -35,6 +36,13 @@ Each module uses treesitter queries to parse and navigate code structures:
 - Includes ignore list for specific functions (Join)
 - Integrated with unified repeat motion system
 - Keybindings: `]f` (next), `[f` (previous)
+
+### Identifier Navigation
+- Targets identifiers in short variable declarations (`exists, err := osutil.Exists(pathBuilder)`)
+- Skips identifiers on the same line to avoid iterating through same-line variables
+- Uses caching system for performance optimization
+- Integrated with unified repeat motion system
+- Keybindings: `]i` (next), `[i` (previous)
 
 ### Unified Repeat Motion System  
 - Navigation modules reference a shared state module (`repeat_motion.lua`) for repeat functionality
@@ -84,6 +92,10 @@ vim.keymap.set('n', '[e', go_sparrow.prev_expression_statement, { desc = 'Previo
 -- Function call navigation
 vim.keymap.set('n', ']f', go_sparrow.next_function_call, { desc = 'Next function call' })
 vim.keymap.set('n', '[f', go_sparrow.prev_function_call, { desc = 'Previous function call' })
+
+-- Identifier navigation
+vim.keymap.set('n', ']i', go_sparrow.next_identifier, { desc = 'Next identifier' })
+vim.keymap.set('n', '[i', go_sparrow.prev_identifier, { desc = 'Previous identifier' })
 
 -- Repeat motion (requires repeat_motion.lua module)
 -- vim.keymap.set('n', '\\', function() 

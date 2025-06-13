@@ -44,12 +44,16 @@ local function get_cached_matches()
   for id, node, _ in query:iter_captures(root, buf_nr, top_line, bottom_line) do
     local capture_name = query.captures[id]
     if capture_name == 'identifier' then
-      local start_row, start_col = node:range()
-      table.insert(matches, {
-        node = node,
-        row = start_row,
-        col = start_col,
-      })
+      local identifier_text = vim.treesitter.get_node_text(node, buf_nr)
+      -- Skip "err" identifiers
+      if identifier_text ~= "err" then
+        local start_row, start_col = node:range()
+        table.insert(matches, {
+          node = node,
+          row = start_row,
+          col = start_col,
+        })
+      end
     end
   end
 
@@ -58,14 +62,18 @@ local function get_cached_matches()
     for id, node, _ in query:iter_captures(root, buf_nr, 0, -1) do
       local capture_name = query.captures[id]
       if capture_name == 'identifier' then
-        local start_row, start_col = node:range()
-        -- Skip if already in visible range
-        if start_row < top_line or start_row > bottom_line then
-          table.insert(matches, {
-            node = node,
-            row = start_row,
-            col = start_col,
-          })
+        local identifier_text = vim.treesitter.get_node_text(node, buf_nr)
+        -- Skip "err" identifiers
+        if identifier_text ~= "err" then
+          local start_row, start_col = node:range()
+          -- Skip if already in visible range
+          if start_row < top_line or start_row > bottom_line then
+            table.insert(matches, {
+              node = node,
+              row = start_row,
+              col = start_col,
+            })
+          end
         end
       end
     end
@@ -91,9 +99,10 @@ local function find_prev_identifier(row, col)
   local previous_match = nil
 
   for _, match in ipairs(matches) do
-    if match.row < row or (match.row == row and match.col < col) then
+    -- Skip identifiers on the same line
+    if match.row < row then
       previous_match = match
-    else
+    elseif match.row >= row then
       break
     end
   end
@@ -106,7 +115,8 @@ local function find_next_identifier(row, col)
   assert(matches, 'No matches found')
 
   for _, match in ipairs(matches) do
-    if match.row > row or (match.row == row and match.col > col) then
+    -- Skip identifiers on the same line
+    if match.row > row then
       return match.node
     end
   end
