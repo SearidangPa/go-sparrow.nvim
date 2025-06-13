@@ -8,7 +8,7 @@ go-sparrow is a Neovim plugin that provides enhanced navigation for Go and Lua f
 
 ## Architecture
 
-The plugin consists of five main navigation modules plus shared utility modules:
+The plugin consists of four main navigation modules plus shared utility modules:
 
 - `lua/go-sparrow/go_nav_func_decl.lua` - Navigation between function declarations using `]m`/`[m` keybindings
 - `lua/go-sparrow/go_nav_func_expr.lua` - Navigation between expression statements using `]e`/`[e` keybindings  
@@ -32,22 +32,22 @@ Each module uses treesitter queries to parse and navigate code structures:
 
 ### Function Calls with Assignment Navigation
 - Specifically targets function calls in short variable declarations (`result, err := func()`) and assignment statements
+- Also includes function calls in if statement conditions (e.g., `if !bytes.Equal(...)`)
 - Uses caching system to optimize repeated navigation in same buffer
 - Includes ignore list for specific functions (Join)
-- Integrated with unified repeat motion system
 - Keybindings: `]f` (next), `[f` (previous)
 
 ### Identifier Navigation
 - Targets identifiers in short variable declarations (`exists, err := osutil.Exists(pathBuilder)`)
 - Skips identifiers on the same line to avoid iterating through same-line variables
+- Excludes "err" identifiers from navigation targets
 - Uses caching system for performance optimization
-- Integrated with unified repeat motion system
 - Keybindings: `]i` (next), `[i` (previous)
 
 ### Unified Repeat Motion System  
-- Navigation modules reference a shared state module (`repeat_motion.lua`) for repeat functionality
-- Each navigation function calls `require('go-sparrow.repeat_motion').set_last_function()` to track the last executed function
-- **Note**: The repeat_motion.lua module is currently missing from the codebase but is referenced by all navigation modules
+- **Note**: The repeat_motion.lua module is not currently implemented in the codebase
+- Navigation modules do not currently include repeat functionality
+- If implemented, would provide unified repeat functionality across all navigation commands
 - Expected API functions: `set_last_function()`, `get_last_function()`, `clear_last_function()`, `has_last_function()`, `repeat_last_function()`
 - Expected keybinding: `\` (repeat last motion)
 
@@ -68,9 +68,8 @@ Each module uses treesitter queries to parse and navigate code structures:
 - Support for both Go and Lua languages
 - Ignore lists to skip common utility functions during navigation
 - Count prefix support for all navigation commands (e.g., `3]m` to jump to the 3rd next function)
-- Caching system for performance optimization in function call navigation
-- Planned unified repeat motion functionality (repeat_motion.lua module needed)
-- Performance optimization via visible range prioritization
+- Caching system for performance optimization in function call and identifier navigation
+- Performance optimization via visible range prioritization with fallback to full buffer search
 - Modular architecture with separate concerns for each navigation type
 
 ## Installation and Setup
@@ -97,8 +96,3 @@ vim.keymap.set('n', '[f', go_sparrow.prev_function_call, { desc = 'Previous func
 vim.keymap.set('n', ']i', go_sparrow.next_identifier, { desc = 'Next identifier' })
 vim.keymap.set('n', '[i', go_sparrow.prev_identifier, { desc = 'Previous identifier' })
 
--- Repeat motion (requires repeat_motion.lua module)
--- vim.keymap.set('n', '\\', function() 
---   require('go-sparrow.repeat_motion').repeat_last_function() 
--- end, { desc = 'Repeat last motion' })
-```
