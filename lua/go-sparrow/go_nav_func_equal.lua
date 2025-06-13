@@ -2,6 +2,20 @@ local M = {}
 
 local ignore_list = {
   Join = true,
+  NoError = true,
+  Error = true,
+  Errorf = true,
+  Info = true,
+  Infof = true,
+  Warn = true,
+  Debug = true,
+  Fatal = true,
+  Fatalf = true,
+  Wrap = true,
+  Wrapf = true,
+  WithField = true,
+  WithFields = true,
+  len = true,
 }
 
 local cache = {
@@ -33,6 +47,13 @@ local query_string = [[
           field: (field_identifier) @func_name)
       ])))
 
+;; Chained method calls in assignment statements (e.g., logEntry = logEntry.WithField(...))
+(assignment_statement
+  right: (expression_list
+    (call_expression
+      function: (selector_expression
+        field: (field_identifier) @func_name))))
+
 ;; Function calls in if statement conditions (e.g., if !bytes.Equal(...))
 (if_statement
   condition: (_
@@ -42,6 +63,24 @@ local query_string = [[
         (selector_expression
           field: (field_identifier) @func_name)
       ])))
+
+;; Function calls in expression statements (e.g., func())
+(expression_statement
+  (call_expression
+    function: [
+      (identifier) @func_name
+      (selector_expression
+        field: (field_identifier) @func_name)
+    ]))
+
+;; Function calls in go statements (e.g., go func())
+(go_statement
+  (call_expression
+    function: [
+      (identifier) @func_name
+      (selector_expression
+        field: (field_identifier) @func_name)
+    ]))
 ]]
 
 local function get_parser_and_query()
