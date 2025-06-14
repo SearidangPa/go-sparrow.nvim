@@ -20,10 +20,11 @@ local ignore_list = {
   Wrap = true,
   Wrapf = true,
 
-  -- === in other common cases that i don't care about ===
-  Join = true,
+  -- === go builtins ===
   len = true,
   make = true,
+  -- === common functions that i don't care about ===
+  Join = true,
 }
 
 local cache = {
