@@ -23,8 +23,6 @@ local ignore_list = {
   -- === go builtins ===
   len = true,
   make = true,
-  -- === common functions that i don't care about ===
-  Join = true,
 }
 
 local cache = {
