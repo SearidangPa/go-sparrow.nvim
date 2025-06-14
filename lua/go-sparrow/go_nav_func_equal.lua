@@ -1,19 +1,26 @@
 local M = {}
 
 local ignore_list = {
+  -- === in test ===
   NoError = true,
   Error = true,
   Errorf = true,
+
+  -- === in log ===
   Info = true,
   Infof = true,
   Warn = true,
   Debug = true,
   Fatal = true,
   Fatalf = true,
+  WithFields = true,
+  WithField = true,
+
+  -- === in error handling ===
   Wrap = true,
   Wrapf = true,
-  WithField = true,
-  WithFields = true,
+
+  -- === in other common cases that i don't care about ===
   Join = true,
   len = true,
   make = true,
