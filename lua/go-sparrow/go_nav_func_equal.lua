@@ -1,7 +1,6 @@
 local M = {}
 
 local ignore_list = {
-  Join = true,
   NoError = true,
   Error = true,
   Errorf = true,
@@ -15,7 +14,9 @@ local ignore_list = {
   Wrapf = true,
   WithField = true,
   WithFields = true,
+  Join = true,
   len = true,
+  make = true,
 }
 
 local cache = {
