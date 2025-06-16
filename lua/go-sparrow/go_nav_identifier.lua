@@ -27,14 +27,11 @@ local function get_cached_matches()
   local matches = {}
   local top_line, bottom_line = require('go-sparrow.util_treesitter').get_visible_range()
 
-  -- First get matches in visible range
-  for id, node, _ in query:iter_captures(root, buf_nr, top_line, bottom_line) do
-    local capture_name = query.captures[id]
-    if capture_name == 'identifier' then
-      local identifier_text = vim.treesitter.get_node_text(node, buf_nr)
-      -- Skip "err" identifiers
-      if identifier_text ~= 'err' then
-        local start_row, start_col = node:range()
+  local function process_capture(node, start_line, end_line)
+    local identifier_text = vim.treesitter.get_node_text(node, buf_nr)
+    if identifier_text ~= 'err' then
+      local start_row, start_col = node:range()
+      if not start_line or not end_line or (start_row >= start_line and start_row <= end_line) then
         table.insert(matches, {
           node = node,
           row = start_row,
@@ -44,23 +41,23 @@ local function get_cached_matches()
     end
   end
 
+  -- First get matches in visible range
+  for id, node, _ in query:iter_captures(root, buf_nr, top_line, bottom_line) do
+    local capture_name = query.captures[id]
+    if capture_name == 'identifier' then
+      process_capture(node, top_line, bottom_line)
+    end
+  end
+
   -- If we need more matches, expand search
   if #matches < 10 then -- arbitrary threshold
     for id, node, _ in query:iter_captures(root, buf_nr, 0, -1) do
       local capture_name = query.captures[id]
       if capture_name == 'identifier' then
-        local identifier_text = vim.treesitter.get_node_text(node, buf_nr)
-        -- Skip "err" identifiers
-        if identifier_text ~= 'err' then
-          local start_row, start_col = node:range()
-          -- Skip if already in visible range
-          if start_row < top_line or start_row > bottom_line then
-            table.insert(matches, {
-              node = node,
-              row = start_row,
-              col = start_col,
-            })
-          end
+        local start_row, _ = node:range()
+        -- Skip if already in visible range
+        if start_row < top_line or start_row > bottom_line then
+          process_capture(node)
         end
       end
     end
