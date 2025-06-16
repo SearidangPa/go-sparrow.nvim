@@ -1,14 +1,6 @@
-local function get_root_and_query(opts)
-  local is_func_start = opts and opts.is_func_start or false
-
-  local bufnr = vim.api.nvim_get_current_buf()
+local function get_query(is_func_start)
   local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
   assert(lang, 'Language is nil')
-  local parser = vim.treesitter.get_parser(bufnr, lang, {})
-  assert(parser, 'Parser is nil')
-  local tree = parser:parse()[1]
-  local root = tree:root()
-  assert(root, 'Tree root is nil')
 
   local query
   if lang == 'lua' then
@@ -34,7 +26,6 @@ local function get_root_and_query(opts)
       )
     ]]
       )
-      return root, query
     else
       query = vim.treesitter.query.parse(
         lang,
@@ -57,35 +48,41 @@ local function get_root_and_query(opts)
       ) @func_decl_node
     ]]
       )
-      return root, query
+    end
+  else
+    if is_func_start then
+      query = vim.treesitter.query.parse(
+        lang,
+        [[
+        (function_declaration
+          name: (identifier) @func_decl_start
+        )
+        (method_declaration
+        name: (field_identifier) @func_decl_start
+        )
+      ]]
+      )
+    else
+      query = vim.treesitter.query.parse(
+        lang,
+        [[
+        (function_declaration
+          name: (identifier) @func_decl_start
+        ) @func_decl_node
+        (method_declaration
+        name: (field_identifier) @func_decl_start
+        ) @func_decl_node
+      ]]
+      )
     end
   end
+  return query
+end
 
-  if is_func_start then
-    query = vim.treesitter.query.parse(
-      lang,
-      [[
-      (function_declaration
-        name: (identifier) @func_decl_start
-      )
-      (method_declaration
-      name: (field_identifier) @func_decl_start
-      )
-    ]]
-    )
-  else
-    query = vim.treesitter.query.parse(
-      lang,
-      [[
-      (function_declaration
-        name: (identifier) @func_decl_start
-      ) @func_decl_node
-      (method_declaration
-      name: (field_identifier) @func_decl_start
-      ) @func_decl_node
-    ]]
-    )
-  end
+local function get_root_and_query(opts)
+  local is_func_start = opts and opts.is_func_start or false
+  local root = require('go-sparrow.util_treesitter').get_root_node()
+  local query = get_query(is_func_start)
   return root, query
 end
 
