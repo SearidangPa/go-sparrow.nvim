@@ -7,4 +7,17 @@ function M.get_visible_range()
   return top_line, bottom_line
 end
 
+function M.get_parser_and_query(query_string)
+  local buf_nr = vim.api.nvim_get_current_buf()
+  local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
+  assert(lang, 'Language is nil')
+  local parser = vim.treesitter.get_parser(buf_nr, lang)
+  assert(parser, 'Parser is nil')
+  local tree = parser:parse()[1]
+  local root = tree:root()
+
+  local query = vim.treesitter.query.parse(lang, query_string)
+  return parser, query, root, buf_nr
+end
+
 return M
