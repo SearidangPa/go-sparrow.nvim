@@ -121,7 +121,7 @@ local function move_to_next_func_decl_start()
 end
 
 local function prev_func_decl_start(root, query, cursor_row, cursor_col)
-  local top_line, bottom_line = require('go-sparrow.util_range').get_visible_range()
+  local top_line, bottom_line = require('go-sparrow.util_treesitter').get_visible_range()
   local previous_node = nil
 
   -- First search in visible range

@@ -1,5 +1,5 @@
 local function find_next_if_consequence(node, row, col)
-  local top_line, bottom_line = require('go-sparrow.util_range').get_visible_range()
+  local top_line, bottom_line = require('go-sparrow.util_treesitter').get_visible_range()
 
   local function search_in_range(n, start_row, end_row)
     for child in n:iter_children() do
@@ -67,7 +67,7 @@ local function find_next_if_consequence(node, row, col)
 end
 
 local function find_previous_if_consequence(node, row, col)
-  local top_line, bottom_line = require('go-sparrow.util_range').get_visible_range()
+  local top_line, bottom_line = require('go-sparrow.util_treesitter').get_visible_range()
   local previous_node = nil
 
   local function search_in_range(n, start_row, end_row)
@@ -145,7 +145,7 @@ local function move_to_next_if_consequence()
   if count == 0 then
     count = 1
   end
-  local root = require('go-sparrow.util_range').get_root_node()
+  local root = require('go-sparrow.util_treesitter').get_root_node()
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
@@ -163,7 +163,7 @@ local function move_to_previous_if_consequence()
   if count == 0 then
     count = 1
   end
-  local root = require('go-sparrow.util_range').get_root_node()
+  local root = require('go-sparrow.util_treesitter').get_root_node()
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]

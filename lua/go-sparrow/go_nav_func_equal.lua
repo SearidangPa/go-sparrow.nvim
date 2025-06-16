@@ -98,9 +98,9 @@ local function get_cached_matches()
     return cache.matches
   end
 
-  local _, query, root = require('go-sparrow.util_range').get_parser_and_query(query_string)
+  local _, query, root = require('go-sparrow.util_treesitter').get_parser_and_query(query_string)
   local matches = {}
-  local top_line, bottom_line = require('go-sparrow.util_range').get_visible_range()
+  local top_line, bottom_line = require('go-sparrow.util_treesitter').get_visible_range()
 
   -- First get matches in visible range
   for id, node, _ in query:iter_captures(root, buf_nr, top_line, bottom_line) do
