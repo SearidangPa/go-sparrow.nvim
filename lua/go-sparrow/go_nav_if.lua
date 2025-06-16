@@ -1,13 +1,3 @@
-local function get_root_node()
-  local buf_nr = vim.api.nvim_get_current_buf()
-  local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
-  local parser = vim.treesitter.get_parser(buf_nr, lang)
-  assert(parser, 'No parser found for this buffer')
-  local tree = parser:parse()[1]
-  local root = tree:root()
-  return root
-end
-
 local function find_next_if_consequence(node, row, col)
   local top_line, bottom_line = require('go-sparrow.util_range').get_visible_range()
 
@@ -37,7 +27,7 @@ local function find_next_if_consequence(node, row, col)
             end
           end
         end
-        
+
         if not should_skip then
           -- Find the consequence block within the if statement
           for if_child in child:iter_children() do
@@ -108,7 +98,7 @@ local function find_previous_if_consequence(node, row, col)
             end
           end
         end
-        
+
         if not should_skip then
           -- Find the consequence block within the if statement
           for if_child in child:iter_children() do
@@ -155,7 +145,7 @@ local function move_to_next_if_consequence()
   if count == 0 then
     count = 1
   end
-  local root = get_root_node()
+  local root = require('go-sparrow.util_range').get_root_node()
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
@@ -173,7 +163,7 @@ local function move_to_previous_if_consequence()
   if count == 0 then
     count = 1
   end
-  local root = get_root_node()
+  local root = require('go-sparrow.util_range').get_root_node()
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
@@ -192,3 +182,4 @@ M.next_if_consequence = move_to_next_if_consequence
 M.prev_if_consequence = move_to_previous_if_consequence
 
 return M
+

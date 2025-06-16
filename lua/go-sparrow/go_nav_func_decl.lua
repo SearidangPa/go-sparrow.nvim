@@ -1,4 +1,4 @@
-local function get_root_node(opts)
+local function get_root_and_query(opts)
   local is_func_start = opts and opts.is_func_start or false
 
   local bufnr = vim.api.nvim_get_current_buf()
@@ -106,7 +106,7 @@ local function move_to_next_func_decl_start()
   if count == 0 then
     count = 1
   end
-  local root, query = get_root_node { is_func_start = true }
+  local root, query = get_root_and_query { is_func_start = true }
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
@@ -170,7 +170,7 @@ local function move_to_prev_func_decl_start()
   if count == 0 then
     count = 1
   end
-  local root, query = get_root_node { is_func_start = true }
+  local root, query = get_root_and_query { is_func_start = true }
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row = cursor_pos[1] - 1
