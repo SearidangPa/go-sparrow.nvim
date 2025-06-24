@@ -234,10 +234,8 @@ local function get_prev_match_text(query_type)
   end
 end
 
--- Public API functions
+-- export API: used in go snippet
 function M.get_prev_func_call_with_equal() return get_prev_match_text 'func_calls' end
-
-function M.get_prev_expression() return get_prev_match_text 'expressions' end
 
 -- Movement functions
 M.next_function_call = function() move_to_match('func_calls', 'next') end
