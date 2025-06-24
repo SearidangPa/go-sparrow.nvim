@@ -19,6 +19,7 @@ local ignore_list = {
   -- === in error handling ===
   Wrap = true,
   Wrapf = true,
+  New = true,
 
   -- === go builtins ===
   len = true,
