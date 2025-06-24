@@ -25,7 +25,14 @@ local ignore_list = {
   make = true,
 }
 
-local cache = {
+local func_equal_cache = {
+  buf_nr = nil,
+  changedtick = nil,
+  matches = nil,
+}
+
+-- New cache for expression-specific queries
+local expression_cache = {
   buf_nr = nil,
   changedtick = nil,
   matches = nil,
@@ -60,17 +67,10 @@ local query_string = [[
     (call_expression
       function: (selector_expression
         field: (field_identifier) @func_name))))
+]]
 
-;; Function calls in if statement conditions (e.g., if !bytes.Equal(...))
-(if_statement
-  condition: (_
-    (call_expression
-      function: [
-        (identifier) @func_name
-        (selector_expression
-          field: (field_identifier) @func_name)
-      ])))
-
+-- New query string for expression statements and go statements only
+local expression_query_string = [[
 ;; Function calls in expression statements (e.g., func())
 (expression_statement
   (call_expression
@@ -94,8 +94,8 @@ local function get_cached_matches()
   local buf_nr = vim.api.nvim_get_current_buf()
   local changedtick = vim.api.nvim_buf_get_changedtick(buf_nr)
 
-  if cache.buf_nr == buf_nr and cache.changedtick == changedtick and cache.matches then
-    return cache.matches
+  if func_equal_cache.buf_nr == buf_nr and func_equal_cache.changedtick == changedtick and func_equal_cache.matches then
+    return func_equal_cache.matches
   end
 
   local _, query, root = require('go-sparrow.util_treesitter').get_parser_and_query(query_string)
@@ -148,9 +148,75 @@ local function get_cached_matches()
     return a.row < b.row
   end)
 
-  cache.buf_nr = buf_nr
-  cache.changedtick = changedtick
-  cache.matches = matches
+  func_equal_cache.buf_nr = buf_nr
+  func_equal_cache.changedtick = changedtick
+  func_equal_cache.matches = matches
+
+  return matches
+end
+
+-- New function to get cached expression matches
+local function get_cached_expression_matches()
+  local buf_nr = vim.api.nvim_get_current_buf()
+  local changedtick = vim.api.nvim_buf_get_changedtick(buf_nr)
+
+  if expression_cache.buf_nr == buf_nr and expression_cache.changedtick == changedtick and expression_cache.matches then
+    return expression_cache.matches
+  end
+
+  local _, query, root = require('go-sparrow.util_treesitter').get_parser_and_query(expression_query_string)
+  local matches = {}
+  local top_line, bottom_line = require('go-sparrow.util_treesitter').get_visible_range()
+
+  -- First get matches in visible range
+  for id, node, _ in query:iter_captures(root, buf_nr, top_line, bottom_line) do
+    local capture_name = query.captures[id]
+    if capture_name == 'func_name' then
+      local func_name = vim.treesitter.get_node_text(node, buf_nr)
+      if not ignore_list[func_name] then
+        local start_row, start_col = node:range()
+        table.insert(matches, {
+          node = node,
+          row = start_row,
+          col = start_col,
+          name = func_name,
+        })
+      end
+    end
+  end
+
+  -- If we need more matches, expand search
+  if #matches < 10 then -- arbitrary threshold
+    for id, node, _ in query:iter_captures(root, buf_nr, 0, -1) do
+      local capture_name = query.captures[id]
+      if capture_name == 'func_name' then
+        local start_row, start_col = node:range()
+        -- Skip if already in visible range
+        if start_row < top_line or start_row > bottom_line then
+          local func_name = vim.treesitter.get_node_text(node, buf_nr)
+          if not ignore_list[func_name] then
+            table.insert(matches, {
+              node = node,
+              row = start_row,
+              col = start_col,
+              name = func_name,
+            })
+          end
+        end
+      end
+    end
+  end
+
+  table.sort(matches, function(a, b)
+    if a.row == b.row then
+      return a.col < b.col
+    end
+    return a.row < b.row
+  end)
+
+  expression_cache.buf_nr = buf_nr
+  expression_cache.changedtick = changedtick
+  expression_cache.matches = matches
 
   return matches
 end
@@ -174,6 +240,37 @@ end
 local function find_next_func_call_with_equal(row, col)
   local matches = get_cached_matches()
   assert(matches, 'No matches found')
+
+  for _, match in ipairs(matches) do
+    if match.row > row or (match.row == row and match.col > col) then
+      return match.node
+    end
+  end
+
+  return nil
+end
+
+-- New function to find previous expression
+local function find_prev_expression(row, col)
+  local matches = get_cached_expression_matches()
+  assert(matches, 'No expression matches found')
+  local previous_match = nil
+
+  for _, match in ipairs(matches) do
+    if match.row < row or (match.row == row and match.col < col) then
+      previous_match = match
+    else
+      break
+    end
+  end
+
+  return previous_match and previous_match.node or nil
+end
+
+-- New function to find next expression
+local function find_next_expression(row, col)
+  local matches = get_cached_expression_matches()
+  assert(matches, 'No expression matches found')
 
   for _, match in ipairs(matches) do
     if match.row > row or (match.row == row and match.col > col) then
@@ -218,6 +315,41 @@ local function move_to_previous_func_call()
   end
 end
 
+-- New movement functions for expressions
+local function move_to_next_expression()
+  local count = vim.v.count
+  if count == 0 then
+    count = 1
+  end
+  for _ = 1, count do
+    local cursor_pos = vim.api.nvim_win_get_cursor(0)
+    local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
+    local next_node = find_next_expression(current_row, current_col)
+
+    if next_node then
+      local start_row, start_col, _, _ = next_node:range()
+      vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
+    end
+  end
+end
+
+local function move_to_previous_expression()
+  local count = vim.v.count
+  if count == 0 then
+    count = 1
+  end
+  for _ = 1, count do
+    local cursor_pos = vim.api.nvim_win_get_cursor(0)
+    local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
+    local previous_node = find_prev_expression(current_row, current_col)
+
+    if previous_node then
+      local start_row, start_col, _, _ = previous_node:range()
+      vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
+    end
+  end
+end
+
 function M.get_prev_func_call_with_equal()
   local cursor_pos = vim.api.nvim_win_get_cursor(0)
   local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
@@ -228,7 +360,23 @@ function M.get_prev_func_call_with_equal()
   end
 end
 
+-- New public function to get previous expression
+function M.get_prev_expression()
+  local cursor_pos = vim.api.nvim_win_get_cursor(0)
+  local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
+  local previous_node = find_prev_expression(current_row, current_col)
+  if previous_node then
+    local res = vim.treesitter.get_node_text(previous_node, 0)
+    return res
+  end
+end
+
+-- Export existing functions
 M.next_function_call = move_to_next_func_call
 M.prev_function_call = move_to_previous_func_call
+
+-- Export new expression functions
+M.next_expression = move_to_next_expression
+M.prev_expression = move_to_previous_expression
 
 return M

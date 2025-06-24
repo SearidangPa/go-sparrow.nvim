@@ -1,4 +1,4 @@
-local function find_next_if_consequence(node, row, col)
+local function find_next_if_bracket(node, row, col)
   local top_line, bottom_line = require('go-sparrow.util_treesitter').get_visible_range()
 
   local function search_in_range(n, start_row, end_row)
@@ -29,7 +29,7 @@ local function find_next_if_consequence(node, row, col)
         end
 
         if not should_skip then
-          -- Find the consequence block within the if statement
+          -- Find the bracket block within the if statement
           for if_child in child:iter_children() do
             if if_child:type() == 'block' then
               candidate = if_child
@@ -66,7 +66,7 @@ local function find_next_if_consequence(node, row, col)
   return search_in_range(node, row, math.huge)
 end
 
-local function find_previous_if_consequence(node, row, col)
+local function find_previous_if_bracket(node, row, col)
   local top_line, bottom_line = require('go-sparrow.util_treesitter').get_visible_range()
   local previous_node = nil
 
@@ -100,7 +100,7 @@ local function find_previous_if_consequence(node, row, col)
         end
 
         if not should_skip then
-          -- Find the consequence block within the if statement
+          -- Find the bracket block within the if statement
           for if_child in child:iter_children() do
             if if_child:type() == 'block' then
               candidate = if_child
@@ -140,7 +140,7 @@ local function find_previous_if_consequence(node, row, col)
   return previous_node
 end
 
-local function move_to_next_if_consequence()
+local function move_to_next_if_bracket()
   local count = vim.v.count
   if count == 0 then
     count = 1
@@ -149,7 +149,7 @@ local function move_to_next_if_consequence()
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
-    local next_node = find_next_if_consequence(root, current_row, current_col)
+    local next_node = find_next_if_bracket(root, current_row, current_col)
 
     if next_node then
       local start_row, start_col, _, _ = next_node:range()
@@ -158,7 +158,7 @@ local function move_to_next_if_consequence()
   end
 end
 
-local function move_to_previous_if_consequence()
+local function move_to_previous_if_bracket()
   local count = vim.v.count
   if count == 0 then
     count = 1
@@ -167,7 +167,7 @@ local function move_to_previous_if_consequence()
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
-    local previous_node = find_previous_if_consequence(root, current_row, current_col)
+    local previous_node = find_previous_if_bracket(root, current_row, current_col)
 
     if previous_node then
       local start_row, start_col, _, _ = previous_node:range()
@@ -178,8 +178,7 @@ end
 
 local M = {}
 
-M.next_if_consequence = move_to_next_if_consequence
-M.prev_if_consequence = move_to_previous_if_consequence
+M.next_if_bracket = move_to_next_if_bracket
+M.prev_if_bracket = move_to_previous_if_bracket
 
 return M
-

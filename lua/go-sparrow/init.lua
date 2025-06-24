@@ -14,8 +14,11 @@ M.prev_function_call = func_equal.prev_function_call
 M.next_identifier = nav_identifier.next_identifier
 M.prev_identifier = nav_identifier.prev_identifier
 
-M.next_if_consequence = nav_if.next_if_consequence
-M.prev_if_consequence = nav_if.prev_if_consequence
+M.next_if_bracket = nav_if.next_if_bracket
+M.prev_if_bracket = nav_if.prev_if_bracket
+
+M.move_to_next_expression = func_equal.next_expression
+M.move_to_prev_expression = func_equal.prev_expression
 
 M.setup = function() end
 
