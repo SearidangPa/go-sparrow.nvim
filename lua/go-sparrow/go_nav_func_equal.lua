@@ -69,7 +69,6 @@ local query_string = [[
         field: (field_identifier) @func_name))))
 ]]
 
--- New query string for expression statements and go statements only
 local expression_query_string = [[
 ;; Function calls in expression statements (e.g., func())
 (expression_statement
@@ -88,6 +87,16 @@ local expression_query_string = [[
       (selector_expression
         field: (field_identifier) @func_name)
     ]))
+
+;; Function calls in return statements (e.g., return func())
+(return_statement
+  (expression_list
+    (call_expression
+      function: [
+        (identifier) @func_name
+        (selector_expression
+          field: (field_identifier) @func_name)
+      ])))
 ]]
 
 local function get_cached_matches()
