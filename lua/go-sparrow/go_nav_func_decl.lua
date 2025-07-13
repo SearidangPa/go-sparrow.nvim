@@ -15,6 +15,12 @@ local function get_query(is_func_start)
         name: (dot_index_expression
           field: (identifier) @func_decl_start)
       )
+
+      (function_declaration 
+        name: (method_index_expression 
+          table: (identifier) 
+          method: (identifier) @func_decl_start)
+
       (assignment_statement
         (variable_list
           name: (dot_index_expression
