@@ -1,3 +1,5 @@
+local M = {}
+
 local function get_query(is_func_start)
   local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
   assert(lang, 'Language is nil')
@@ -16,9 +18,9 @@ local function get_query(is_func_start)
           field: (identifier) @func_decl_start)
       )
 
-      (function_declaration 
-        name: (method_index_expression 
-          table: (identifier) 
+      (function_declaration
+        name: (method_index_expression
+          table: (identifier)
           method: (identifier) @func_decl_start)
       )
 
@@ -105,7 +107,7 @@ local function find_next_func_decl_start(root, query, cursor_row, cursor_col)
   return nil
 end
 
-local function move_to_next_func_decl_start()
+M.next_func_declaration = function()
   local count = vim.v.count
   if count == 0 then
     count = 1
@@ -124,7 +126,8 @@ local function move_to_next_func_decl_start()
   end
 end
 
-local function prev_func_decl_start(root, query, cursor_row, cursor_col)
+---@return TSNode|nil
+M.find_prev_func_decl_start = function(root, query, cursor_row, cursor_col)
   local top_line, bottom_line = require('go-sparrow.util_treesitter').get_visible_range()
   local previous_node = nil
 
@@ -169,7 +172,7 @@ local function prev_func_decl_start(root, query, cursor_row, cursor_col)
   return previous_node
 end
 
-local function move_to_prev_func_decl_start()
+M.prev_func_declaration = function()
   local count = vim.v.count
   if count == 0 then
     count = 1
@@ -179,7 +182,7 @@ local function move_to_prev_func_decl_start()
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row = cursor_pos[1] - 1
     local current_col = cursor_pos[2]
-    local previous_node = prev_func_decl_start(root, query, current_row, current_col)
+    local previous_node = M.find_prev_func_decl_start(root, query, current_row, current_col)
     if previous_node then
       local start_row, start_col, _, _ = previous_node:range()
       vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
@@ -188,9 +191,6 @@ local function move_to_prev_func_decl_start()
   end
 end
 
-local M = {}
 
-M.next_function_declaration = move_to_next_func_decl_start
-M.prev_function_declaration = move_to_prev_func_decl_start
 
 return M
