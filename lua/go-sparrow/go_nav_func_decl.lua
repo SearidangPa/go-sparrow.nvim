@@ -1,15 +1,14 @@
 local M = {}
 
-local function get_query(is_func_start)
+local function get_query()
   local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
   assert(lang, 'Language is nil')
 
   local query
   if lang == 'lua' then
-    if is_func_start then
-      query = vim.treesitter.query.parse(
-        lang,
-        [[
+    query = vim.treesitter.query.parse(
+      lang,
+      [[
       (function_declaration
         name: (identifier) @func_decl_start
       )
@@ -34,35 +33,11 @@ local function get_query(is_func_start)
         )
       )
     ]]
-      )
-    else
-      query = vim.treesitter.query.parse(
-        lang,
-        [[
-      (function_declaration
-        name: (identifier) @func_decl_start
-      ) @func_decl_node
-      (function_declaration
-        name: (dot_index_expression
-          field: (identifier) @func_decl_start)
-      ) @func_decl_node
-      (assignment_statement
-        (variable_list
-          name: (dot_index_expression
-            field: (identifier) @func_decl_start)
-        )
-        (expression_list
-          value: (function_definition)
-        )
-      ) @func_decl_node
-    ]]
-      )
-    end
+    )
   else
-    if is_func_start then
-      query = vim.treesitter.query.parse(
-        lang,
-        [[
+    query = vim.treesitter.query.parse(
+      lang,
+      [[
         (function_declaration
           name: (identifier) @func_decl_start
         )
@@ -70,28 +45,14 @@ local function get_query(is_func_start)
         name: (field_identifier) @func_decl_start
         )
       ]]
-      )
-    else
-      query = vim.treesitter.query.parse(
-        lang,
-        [[
-        (function_declaration
-          name: (identifier) @func_decl_start
-        ) @func_decl_node
-        (method_declaration
-        name: (field_identifier) @func_decl_start
-        ) @func_decl_node
-      ]]
-      )
-    end
+    )
   end
   return query
 end
 
-local function get_root_and_query(opts)
-  local is_func_start = opts and opts.is_func_start or false
+local function get_root_and_query()
   local root = require('go-sparrow.util_treesitter').get_root_node()
-  local query = get_query(is_func_start)
+  local query = get_query()
   return root, query
 end
 
@@ -112,7 +73,7 @@ M.next_func_declaration = function()
   if count == 0 then
     count = 1
   end
-  local root, query = get_root_and_query { is_func_start = true }
+  local root, query = get_root_and_query()
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
@@ -177,7 +138,7 @@ M.prev_func_declaration = function()
   if count == 0 then
     count = 1
   end
-  local root, query = get_root_and_query { is_func_start = true }
+  local root, query = get_root_and_query()
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row = cursor_pos[1] - 1
