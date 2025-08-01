@@ -88,7 +88,8 @@ M.next_func_declaration = function()
 end
 
 ---@return TSNode|nil
-M.find_prev_func_declaration = function(root, query, cursor_row, cursor_col)
+M.find_prev_func_declaration = function(cursor_row, cursor_col)
+  local root, query = get_root_and_query()
   local top_line, bottom_line = require('go-sparrow.util_treesitter').get_visible_range()
   local previous_node = nil
 
@@ -138,12 +139,11 @@ M.prev_func_declaration = function()
   if count == 0 then
     count = 1
   end
-  local root, query = get_root_and_query()
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row = cursor_pos[1] - 1
     local current_col = cursor_pos[2]
-    local previous_node = M.find_prev_func_declaration(root, query, current_row, current_col)
+    local previous_node = M.find_prev_func_declaration(current_row, current_col)
     if previous_node then
       local start_row, start_col, _, _ = previous_node:range()
       vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
