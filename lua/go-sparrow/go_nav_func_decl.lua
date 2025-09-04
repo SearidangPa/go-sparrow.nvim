@@ -12,6 +12,7 @@ local function get_query()
       (function_declaration
         name: (identifier) @func_decl_start
       )@func_node
+
       (function_declaration
         name: (dot_index_expression
           field: (identifier) @func_decl_start)
@@ -69,21 +70,35 @@ local function get_root_and_query()
   return root, query
 end
 
-local function find_next_func_declaration(root, query, cursor_row, cursor_col)
+local function find_next_func_declaration(root, query, cursor_row, cursor_col, skip_one)
+  local row_to_pass = cursor_row
+
   for id, node in query:iter_captures(root, 0, 0, -1) do
     assert(node, "node is nil")
     local name = query.captures[id] -- name of the capture in the query
+    local s_row, s_col, e_row, _ = node:range()
+
+    if name == "func_node" and skip_one then
+      if e_row > row_to_pass then
+        skip_one = false
+        row_to_pass = e_row
+      end
+      goto continue
+    end
+
     if name == "func_decl_start" then
-      local s_row, s_col, _ = node:start()
-      if s_row > cursor_row or (s_row == cursor_row and s_col > cursor_col) then
+      if s_row > row_to_pass or (s_row == row_to_pass and s_col > cursor_col) then
         return node
       end
     end
+    ::continue::
   end
   return nil
 end
 
-M.next_func_declaration = function()
+
+M.next_func_declaration = function(opts)
+  local skip_one = opts and opts.skip_one or false
   local count = vim.v.count
   if count == 0 then
     count = 1
@@ -92,7 +107,7 @@ M.next_func_declaration = function()
   for _ = 1, count do
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
-    local next_node = find_next_func_declaration(root, query, current_row, current_col)
+    local next_node = find_next_func_declaration(root, query, current_row, current_col, skip_one)
 
     if next_node then
       local start_row, start_col, _, _ = next_node:range()

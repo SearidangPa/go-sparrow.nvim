@@ -7,7 +7,6 @@ local nav_if = require 'go-sparrow.go_nav_if'
 
 M.next_function_declaration = func_decl.next_func_declaration
 M.prev_function_declaration = func_decl.prev_func_declaration
-M.prev_function_declaration_outer_most = func_decl.prev_func_declaration_outer_most
 
 M.next_function_call = func_equal.next_function_call
 M.prev_function_call = func_equal.prev_function_call
