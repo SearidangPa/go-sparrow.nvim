@@ -23,6 +23,19 @@ local function get_query()
           method: (identifier) @func_decl_start)
       )
 
+
+      (variable_declaration
+        (assignment_statement
+           (variable_list
+             name: (identifier) @func_decl_start
+           )
+           (expression_list
+           	value: (function_definition)
+           )
+        )
+      )
+
+
       (assignment_statement
         (variable_list
           name: (dot_index_expression
