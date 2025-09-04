@@ -11,17 +11,17 @@ local function get_query()
       [[
       (function_declaration
         name: (identifier) @func_decl_start
-      )
+      )@func_node
       (function_declaration
         name: (dot_index_expression
           field: (identifier) @func_decl_start)
-      )
+      )@func_node
 
       (function_declaration
         name: (method_index_expression
           table: (identifier)
           method: (identifier) @func_decl_start)
-      )
+      )@func_node
 
 
       (variable_declaration
@@ -33,7 +33,7 @@ local function get_query()
            	value: (function_definition)
            )
         )
-      )
+      )@func_node
 
 
       (assignment_statement
@@ -44,7 +44,7 @@ local function get_query()
         (expression_list
           value: (function_definition)
         )
-      )
+      )@func_node
     ]]
     )
   else
@@ -70,8 +70,10 @@ local function get_root_and_query()
 end
 
 local function find_next_func_declaration(root, query, cursor_row, cursor_col)
-  for _, node in query:iter_captures(root, 0, 0, -1) do
-    if node then
+  for id, node in query:iter_captures(root, 0, 0, -1) do
+    assert(node, "node is nil")
+    local name = query.captures[id] -- name of the capture in the query
+    if name == "func_decl_start" then
       local s_row, s_col, _ = node:start()
       if s_row > cursor_row or (s_row == cursor_row and s_col > cursor_col) then
         return node
