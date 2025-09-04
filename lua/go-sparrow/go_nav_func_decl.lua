@@ -6,7 +6,6 @@ local function get_query()
 
   local query
   if lang == 'lua' then
-    -- if is_func_start then
     query = vim.treesitter.query.parse(
       lang,
       [[
