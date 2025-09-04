@@ -106,8 +106,10 @@ M.find_prev_func_declaration = function(root, query, cursor_row, cursor_col)
   local previous_node = nil
 
   -- First search in visible range
-  for _, node, _, _ in query:iter_captures(root, 0, top_line, bottom_line) do
-    if node then
+  for id, node, _, _ in query:iter_captures(root, 0, top_line, bottom_line) do
+    assert(node, "node is nil")
+    local name = query.captures[id] -- name of the capture in the query
+    if name == "func_decl_start" then
       local s_row, s_col, _ = node:start()
       if s_row < cursor_row or (s_row == cursor_row and s_col < cursor_col) then
         if not previous_node then
@@ -127,8 +129,10 @@ M.find_prev_func_declaration = function(root, query, cursor_row, cursor_col)
   end
 
   -- Fallback to full search from beginning to cursor
-  for _, node, _, _ in query:iter_captures(root, 0, 0, cursor_row) do
-    if node then
+  for id, node, _, _ in query:iter_captures(root, 0, 0, cursor_row) do
+    assert(node, "node is nil")
+    local name = query.captures[id] -- name of the capture in the query
+    if name == "func_decl_start" then
       local s_row, s_col, _ = node:start()
       if s_row < cursor_row or (s_row == cursor_row and s_col < cursor_col) then
         if not previous_node then
