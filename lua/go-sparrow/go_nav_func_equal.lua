@@ -72,6 +72,21 @@ local function get_query()
   end
 
   if lang == 'lua' then
+    return {
+      func_calls = [[
+      (variable_declaration
+        (assignment_statement
+           (variable_list
+          	  name: (identifier))
+           (expression_list
+             value:(function_call
+      	       name: (identifier) @func_name
+      	       )
+           )
+        )
+      )
+      ]]
+    }
   end
 
   assert(false, 'Unsupported language: ' .. lang)
