@@ -26,7 +26,6 @@ local ignore_list = {
   make = true,
 }
 
--- Query definitions
 local queries = {
   func_calls = [[
 ;; Function calls in short variable declarations (e.g., result, err := func())
@@ -90,10 +89,8 @@ local queries = {
 ]],
 }
 
--- Unified cache system
 local cache = {}
 
--- Initialize cache for each query type
 for query_type, _ in pairs(queries) do
   cache[query_type] = {
     buf_nr = nil,
@@ -102,7 +99,6 @@ for query_type, _ in pairs(queries) do
   }
 end
 
--- Generic function to get cached matches for any query type
 local function get_cached_matches(query_type)
   local buf_nr = vim.api.nvim_get_current_buf()
   local changedtick = vim.api.nvim_buf_get_changedtick(buf_nr)
@@ -168,7 +164,6 @@ local function get_cached_matches(query_type)
   return matches
 end
 
--- Generic function to find previous match
 local function find_prev_match(query_type, row, col)
   local matches = get_cached_matches(query_type)
   assert(matches, string.format('No %s matches found', query_type))
@@ -185,7 +180,6 @@ local function find_prev_match(query_type, row, col)
   return previous_match and previous_match.node or nil
 end
 
--- Generic function to find next match
 local function find_next_match(query_type, row, col)
   local matches = get_cached_matches(query_type)
   assert(matches, string.format('No %s matches found', query_type))
@@ -199,7 +193,6 @@ local function find_next_match(query_type, row, col)
   return nil
 end
 
--- Generic movement function
 local function move_to_match(query_type, direction)
   local count = vim.v.count
   if count == 0 then
@@ -224,7 +217,6 @@ local function move_to_match(query_type, direction)
   end
 end
 
--- Generic function to get previous match text
 local function get_prev_match_text(query_type)
   local cursor_pos = vim.api.nvim_win_get_cursor(0)
   local current_row, current_col = cursor_pos[1] - 1, cursor_pos[2]
@@ -235,10 +227,8 @@ local function get_prev_match_text(query_type)
   end
 end
 
--- export API: used in go snippet
 function M.get_prev_func_call_with_equal() return get_prev_match_text 'func_calls' end
 
--- Movement functions
 M.next_function_call = function() move_to_match('func_calls', 'next') end
 M.prev_function_call = function() move_to_match('func_calls', 'prev') end
 M.next_expression = function() move_to_match('expressions', 'next') end
