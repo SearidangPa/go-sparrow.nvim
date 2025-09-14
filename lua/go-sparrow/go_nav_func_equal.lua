@@ -1,33 +1,14 @@
 local M = {}
 
-local ignore_list = {
-  -- === in test ===
-  NoError = true,
-  Error = true,
-  Errorf = true,
+local cache = {}
 
-  -- === in log ===
-  Info = true,
-  Infof = true,
-  Warn = true,
-  Debug = true,
-  Fatal = true,
-  Fatalf = true,
-  WithFields = true,
-  WithField = true,
+local function get_query()
+  local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
+  assert(lang, 'Language is nil')
 
-  -- === in error handling ===
-  Wrap = true,
-  Wrapf = true,
-  New = true,
-
-  -- === go builtins ===
-  len = true,
-  make = true,
-}
-
-local queries = {
-  func_calls = [[
+  if lang == 'go' then
+    return {
+      func_calls = [[
 ;; Function calls in short variable declarations (e.g., result, err := func())
 (short_var_declaration
   left: (expression_list)
@@ -58,7 +39,7 @@ local queries = {
         field: (field_identifier) @func_name))))
 ]],
 
-  expressions = [[
+      expressions = [[
 ;; Function calls in expression statements (e.g., func())
 (expression_statement
   (call_expression
@@ -87,17 +68,56 @@ local queries = {
           field: (field_identifier) @func_name)
       ])))
 ]],
+    }
+  end
+
+  if lang == 'lua' then
+  end
+
+  assert(false, 'Unsupported language: ' .. lang)
+end
+
+
+local init_cache = function()
+  for query_type, _ in pairs(get_query()) do
+    cache[query_type] = {
+      buf_nr = nil,
+      changedtick = nil,
+      matches = nil,
+    }
+  end
+end
+
+init_cache()
+
+
+
+local ignore_list = {
+  -- === in test ===
+  NoError = true,
+  Error = true,
+  Errorf = true,
+
+  -- === in log ===
+  Info = true,
+  Infof = true,
+  Warn = true,
+  Debug = true,
+  Fatal = true,
+  Fatalf = true,
+  WithFields = true,
+  WithField = true,
+
+  -- === in error handling ===
+  Wrap = true,
+  Wrapf = true,
+  New = true,
+
+  -- === go builtins ===
+  len = true,
+  make = true,
 }
 
-local cache = {}
-
-for query_type, _ in pairs(queries) do
-  cache[query_type] = {
-    buf_nr = nil,
-    changedtick = nil,
-    matches = nil,
-  }
-end
 
 local function get_cached_matches(query_type)
   local buf_nr = vim.api.nvim_get_current_buf()
@@ -110,7 +130,9 @@ local function get_cached_matches(query_type)
   end
 
   -- Get new matches
-  local _, query, root = require('go-sparrow.util_treesitter').get_parser_and_query(queries[query_type])
+  local queries = get_query()
+  local query_string = queries[query_type]
+  local _, query, root = require('go-sparrow.util_treesitter').get_parser_and_query(query_string)
   local matches = {}
   local top_line, bottom_line = require('go-sparrow.util_treesitter').get_visible_range()
 
