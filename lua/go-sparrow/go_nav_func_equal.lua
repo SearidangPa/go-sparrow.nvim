@@ -85,10 +85,20 @@ local function get_query()
            )
         )
       )
+      ]],
+      expressions = [[
+          (function_call
+            name: (dot_index_expression
+              table: (identifier)
+              field: (identifier) @func_name
+          ))
       ]]
     }
   end
 
+  -- (function_call
+  --   name: (identifier) @func_name
+  --   arguments: (arguments))
   assert(false, 'Unsupported language: ' .. lang)
 end
 
