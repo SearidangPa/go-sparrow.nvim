@@ -92,13 +92,14 @@ local function get_query()
               table: (identifier)
               field: (identifier) @func_name
           ))
+
+         (function_call
+           name: (identifier) @func_name
+           arguments: (arguments))
       ]]
     }
   end
 
-  -- (function_call
-  --   name: (identifier) @func_name
-  --   arguments: (arguments))
   assert(false, 'Unsupported language: ' .. lang)
 end
 
