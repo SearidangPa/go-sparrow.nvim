@@ -48,7 +48,7 @@ local function get_query()
       )@func_node
     ]]
     )
-  else
+  elseif lang == 'go' then
     query = vim.treesitter.query.parse(
       lang,
       [[
@@ -57,6 +57,15 @@ local function get_query()
         )
         (method_declaration
         name: (field_identifier) @func_decl_start
+        )
+      ]]
+    )
+  elseif lang == 'zig' then
+    query = vim.treesitter.query.parse(
+      lang,
+      [[
+        (function_declaration
+          name: (identifier) @func_decl_start
         )
       ]]
     )

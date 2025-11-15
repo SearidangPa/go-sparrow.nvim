@@ -99,18 +99,19 @@ local function get_query()
       ]]
     }
   end
-
-  assert(false, 'Unsupported language: ' .. lang)
 end
 
 
 local init_cache = function()
-  for query_type, _ in pairs(get_query()) do
-    cache[query_type] = {
-      buf_nr = nil,
-      changedtick = nil,
-      matches = nil,
-    }
+  local query = get_query()
+  if query then
+    for query_type, _ in pairs(get_query()) do
+      cache[query_type] = {
+        buf_nr = nil,
+        changedtick = nil,
+        matches = nil,
+      }
+    end
   end
 end
 
