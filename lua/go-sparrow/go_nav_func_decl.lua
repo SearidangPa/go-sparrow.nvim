@@ -69,6 +69,13 @@ local function get_query()
         )
       ]]
     )
+  elseif lang == 'fish' then
+    query = vim.treesitter.query.parse(
+      lang,
+      [[
+        (function_definition) @func_decl_start
+      ]]
+    )
   end
   return query
 end
