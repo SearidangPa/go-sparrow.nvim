@@ -34,7 +34,6 @@ local function get_query()
   assert(false, 'Unsupported language: ' .. lang)
 end
 
-
 local function get_cached_matches()
   local buf_nr = vim.api.nvim_get_current_buf()
   local changedtick = vim.api.nvim_buf_get_changedtick(buf_nr)

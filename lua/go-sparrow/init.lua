@@ -16,7 +16,6 @@ M.prev_identifier = nav_identifier.prev_identifier
 M.next_expression = func_equal.next_expression
 M.prev_expression = func_equal.prev_expression
 
-
 M.setup = function() end
 
 return M

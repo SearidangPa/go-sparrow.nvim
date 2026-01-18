@@ -96,11 +96,10 @@ local function get_query()
          (function_call
            name: (identifier) @func_name
            arguments: (arguments))
-      ]]
+      ]],
     }
   end
 end
-
 
 local init_cache = function()
   local query = get_query()
@@ -116,8 +115,6 @@ local init_cache = function()
 end
 
 init_cache()
-
-
 
 local ignore_list = {
   -- === in test ===
@@ -144,7 +141,6 @@ local ignore_list = {
   len = true,
   make = true,
 }
-
 
 local function get_cached_matches(query_type)
   local buf_nr = vim.api.nvim_get_current_buf()

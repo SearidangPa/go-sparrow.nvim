@@ -86,15 +86,40 @@ local function get_root_and_query()
   return root, query
 end
 
+local function cursor_in_node(cursor_row, cursor_col, node)
+  local s_row, s_col, e_row, e_col = node:range()
+  local after_start = cursor_row > s_row or (cursor_row == s_row and cursor_col >= s_col)
+  local before_end = cursor_row < e_row or (cursor_row == e_row and cursor_col < e_col)
+  return after_start and before_end
+end
+
+local function find_outermost_func_node(root, query, cursor_row, cursor_col)
+  for id, node in query:iter_captures(root, 0, 0, -1) do
+    if query.captures[id] == 'func_node' and cursor_in_node(cursor_row, cursor_col, node) then
+      return node
+    end
+  end
+  return nil
+end
+
+local function find_func_decl_start(node, query)
+  for id, capture in query:iter_captures(node, 0, 0, -1) do
+    if query.captures[id] == 'func_decl_start' then
+      return capture
+    end
+  end
+  return nil
+end
+
 local function find_next_func_declaration(root, query, cursor_row, cursor_col, skip_one)
   local row_to_pass = cursor_row
 
   for id, node in query:iter_captures(root, 0, 0, -1) do
-    assert(node, "node is nil")
+    assert(node, 'node is nil')
     local name = query.captures[id] -- name of the capture in the query
     local s_row, s_col, e_row, _ = node:range()
 
-    if name == "func_node" and skip_one then
+    if name == 'func_node' and skip_one then
       if e_row > row_to_pass then
         skip_one = false
         row_to_pass = e_row
@@ -102,7 +127,7 @@ local function find_next_func_declaration(root, query, cursor_row, cursor_col, s
       goto continue
     end
 
-    if name == "func_decl_start" then
+    if name == 'func_decl_start' then
       if s_row > row_to_pass or (s_row == row_to_pass and s_col > cursor_col) then
         return node
       end
@@ -111,7 +136,6 @@ local function find_next_func_declaration(root, query, cursor_row, cursor_col, s
   end
   return nil
 end
-
 
 M.next_func_declaration = function(opts)
   local skip_one = opts and opts.skip_one or false
@@ -141,9 +165,9 @@ M.find_prev_func_declaration = function(root, query, cursor_row, cursor_col, out
 
   -- First search in visible range
   for id, node, _, _ in query:iter_captures(root, 0, top_line, bottom_line) do
-    assert(node, "node is nil")
+    assert(node, 'node is nil')
     local name = query.captures[id] -- name of the capture in the query
-    if name == "func_decl_start" then
+    if name == 'func_decl_start' then
       local s_row, s_col, _ = node:start()
       if s_row < cursor_row or (s_row == cursor_row and s_col < cursor_col) then
         if not previous_node then
@@ -156,16 +180,16 @@ M.find_prev_func_declaration = function(root, query, cursor_row, cursor_col, out
         end
       end
     end
-    if outer_most and name == "func_node" then
-      local _, _, e_row, _ = node:start()
-      if e_row > cursor_row then
-        for child in node:iter_children() do
-          if child:type() == "identifier" then
-            return child
-          end
-        end
-        return node
+  end
+
+  if outer_most then
+    local outer_node = find_outermost_func_node(root, query, cursor_row, cursor_col)
+    if outer_node then
+      local decl_start = find_func_decl_start(outer_node, query)
+      if decl_start then
+        return decl_start
       end
+      return outer_node
     end
   end
 
@@ -175,9 +199,9 @@ M.find_prev_func_declaration = function(root, query, cursor_row, cursor_col, out
 
   -- Fallback to full search from beginning to cursor
   for id, node, _, _ in query:iter_captures(root, 0, 0, cursor_row) do
-    assert(node, "node is nil")
+    assert(node, 'node is nil')
     local name = query.captures[id] -- name of the capture in the query
-    if name == "func_decl_start" then
+    if name == 'func_decl_start' then
       local s_row, s_col, _ = node:start()
       if s_row < cursor_row or (s_row == cursor_row and s_col < cursor_col) then
         if not previous_node then
@@ -214,7 +238,5 @@ M.prev_func_declaration = function(opts)
     end
   end
 end
-
-
 
 return M
