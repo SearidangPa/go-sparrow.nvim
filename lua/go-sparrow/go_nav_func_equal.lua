@@ -2,13 +2,10 @@ local M = {}
 
 local cache = {}
 
-local function get_query()
-  local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
-  assert(lang, 'Language is nil')
-
-  if lang == 'go' then
-    return {
-      func_calls = [[
+-- Query strings as constants per language
+local QUERY_STRINGS = {
+  go = {
+    func_calls = [[
 ;; Function calls in short variable declarations (e.g., result, err := func())
 (short_var_declaration
   left: (expression_list)
@@ -38,8 +35,7 @@ local function get_query()
       function: (selector_expression
         field: (field_identifier) @func_name))))
 ]],
-
-      expressions = [[
+    expressions = [[
 ;; Function calls in expression statements (e.g., func())
 (expression_statement
   (call_expression
@@ -68,12 +64,9 @@ local function get_query()
           field: (field_identifier) @func_name)
       ])))
 ]],
-    }
-  end
-
-  if lang == 'lua' then
-    return {
-      func_calls = [[
+  },
+  lua = {
+    func_calls = [[
       (variable_declaration
         (assignment_statement
            (variable_list
@@ -86,7 +79,7 @@ local function get_query()
         )
       )
       ]],
-      expressions = [[
+    expressions = [[
           (function_call
             name: (dot_index_expression
               table: (identifier)
@@ -97,24 +90,28 @@ local function get_query()
            name: (identifier) @func_name
            arguments: (arguments))
       ]],
-    }
-  end
+  },
+}
+
+local function get_query_strings()
+  local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
+  return lang and QUERY_STRINGS[lang] or nil
 end
 
-local init_cache = function()
-  local query = get_query()
-  if query then
-    for query_type, _ in pairs(get_query()) do
-      cache[query_type] = {
-        buf_nr = nil,
-        changedtick = nil,
-        matches = nil,
-      }
+local function ensure_cache_initialized()
+  local queries = get_query_strings()
+  if queries then
+    for query_type, _ in pairs(queries) do
+      if not cache[query_type] then
+        cache[query_type] = {
+          buf_nr = nil,
+          changedtick = nil,
+          matches = nil,
+        }
+      end
     end
   end
 end
-
-init_cache()
 
 local ignore_list = {
   -- === in test ===
@@ -143,17 +140,26 @@ local ignore_list = {
 }
 
 local function get_cached_matches(query_type)
+  ensure_cache_initialized()
+
   local buf_nr = vim.api.nvim_get_current_buf()
   local changedtick = vim.api.nvim_buf_get_changedtick(buf_nr)
   local query_cache = cache[query_type]
+
+  if not query_cache then
+    return {}
+  end
 
   -- Return cached results if valid
   if query_cache.buf_nr == buf_nr and query_cache.changedtick == changedtick and query_cache.matches then
     return query_cache.matches
   end
 
-  -- Get new matches
-  local queries = get_query()
+  -- Get new matches using cached query
+  local queries = get_query_strings()
+  if not queries then
+    return {}
+  end
   local query_string = queries[query_type]
   local _, query, root = require('go-sparrow.util_treesitter').get_parser_and_query(query_string)
   local matches = {}

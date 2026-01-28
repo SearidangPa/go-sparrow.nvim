@@ -6,32 +6,31 @@ local cache = {
   matches = nil,
 }
 
-local function get_query()
-  local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
-  assert(lang, 'Language is nil')
-
-  if lang == 'go' then
-    return [[
+-- Query strings as constants per language
+local QUERY_STRINGS = {
+  go = [[
     (short_var_declaration
       left: (expression_list
         (identifier) @identifier)
       right: (expression_list
         (call_expression)))
-        ]]
-  end
-
-  if lang == 'lua' then
-    return [[
+        ]],
+  lua = [[
       (variable_declaration
         (assignment_statement
            (variable_list
           	  name: (identifier)) @identifier
 	)
       )
-    ]]
-  end
+    ]],
+}
 
-  assert(false, 'Unsupported language: ' .. lang)
+local function get_query_string()
+  local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
+  if not lang then
+    return nil
+  end
+  return QUERY_STRINGS[lang]
 end
 
 local function get_cached_matches()
@@ -42,7 +41,10 @@ local function get_cached_matches()
     return cache.matches
   end
 
-  local query_string = get_query()
+  local query_string = get_query_string()
+  if not query_string then
+    return {}
+  end
   local _, query, root = require('go-sparrow.util_treesitter').get_parser_and_query(query_string)
   local matches = {}
   local top_line, bottom_line = require('go-sparrow.util_treesitter').get_visible_range()

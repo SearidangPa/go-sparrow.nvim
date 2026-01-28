@@ -1,14 +1,8 @@
 local M = {}
 
-local function get_query()
-  local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
-  assert(lang, 'Language is nil')
-
-  local query
-  if lang == 'lua' then
-    query = vim.treesitter.query.parse(
-      lang,
-      [[
+-- Query strings as constants (compiled once per language via cache)
+local QUERY_STRINGS = {
+  lua = [[
       (function_declaration
         name: (identifier) @func_decl_start
       )@func_node
@@ -46,43 +40,33 @@ local function get_query()
           value: (function_definition)
         )
       )@func_node
-    ]]
-    )
-  elseif lang == 'go' then
-    query = vim.treesitter.query.parse(
-      lang,
-      [[
+    ]],
+  go = [[
         (function_declaration
           name: (identifier) @func_decl_start
         )
         (method_declaration
         name: (field_identifier) @func_decl_start
         )
-      ]]
-    )
-  elseif lang == 'zig' then
-    query = vim.treesitter.query.parse(
-      lang,
-      [[
+      ]],
+  zig = [[
         (function_declaration
           name: (identifier) @func_decl_start
         )
-      ]]
-    )
-  elseif lang == 'fish' then
-    query = vim.treesitter.query.parse(
-      lang,
-      [[
+      ]],
+  fish = [[
         (function_definition) @func_decl_start
-      ]]
-    )
-  end
-  return query
-end
+      ]],
+}
 
 local function get_root_and_query()
-  local root = require('go-sparrow.util_treesitter').get_root_node()
-  local query = get_query()
+  local util_treesitter = require 'go-sparrow.util_treesitter'
+  local root, lang = util_treesitter.get_root_and_lang()
+  local query_string = QUERY_STRINGS[lang]
+  if not query_string then
+    return root, nil
+  end
+  local query = util_treesitter.get_cached_query(lang, query_string)
   return root, query
 end
 
