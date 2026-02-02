@@ -88,7 +88,7 @@ local QUERY_STRINGS = {
     expressions = [[
           (function_call
             name: (dot_index_expression
-              table: (identifier)
+              table: (_)
               field: (identifier) @func_name
           ))
 
@@ -98,7 +98,7 @@ local QUERY_STRINGS = {
 
          (function_call
            name: (method_index_expression
-             table: (identifier)
+             table: (_)
              method: (identifier) @func_name))
       ]],
   },
