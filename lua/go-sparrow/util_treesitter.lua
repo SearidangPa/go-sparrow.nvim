@@ -13,6 +13,18 @@ function M.get_cached_query(lang, query_string)
   return query_cache[lang][query_string]
 end
 
+function M.get_cached_query_by_name(lang, query_name)
+  if not query_cache[lang] then
+    query_cache[lang] = {}
+  end
+  if not query_cache[lang][query_name] then
+    local query = vim.treesitter.query.get(lang, query_name)
+    assert(query, string.format('Query %s not found for %s', query_name, lang))
+    query_cache[lang][query_name] = query
+  end
+  return query_cache[lang][query_name]
+end
+
 function M.get_root_and_lang()
   local buf_nr = vim.api.nvim_get_current_buf()
   local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
@@ -40,6 +52,19 @@ function M.get_parser_and_query(query_string)
   local root = tree:root()
 
   local query = M.get_cached_query(lang, query_string)
+  return parser, query, root, buf_nr
+end
+
+function M.get_parser_and_named_query(query_name)
+  local buf_nr = vim.api.nvim_get_current_buf()
+  local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
+  assert(lang, 'Language is nil')
+  local parser = vim.treesitter.get_parser(buf_nr, lang)
+  assert(parser, 'Parser is nil')
+  local tree = parser:parse()[1]
+  local root = tree:root()
+
+  local query = M.get_cached_query_by_name(lang, query_name)
   return parser, query, root, buf_nr
 end
 

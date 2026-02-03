@@ -1,72 +1,11 @@
 local M = {}
 
--- Query strings as constants (compiled once per language via cache)
-local QUERY_STRINGS = {
-  lua = [[
-      (function_declaration
-        name: (identifier) @func_decl_start
-      )@func_node
-
-      (function_declaration
-        name: (dot_index_expression
-          field: (identifier) @func_decl_start)
-      )@func_node
-
-      (function_declaration
-        name: (method_index_expression
-          table: (identifier)
-          method: (identifier) @func_decl_start)
-      )@func_node
-
-
-      (variable_declaration
-        (assignment_statement
-           (variable_list
-             name: (identifier) @func_decl_start
-           )
-           (expression_list
-           	value: (function_definition)
-           )
-        )
-      )@func_node
-
-
-      (assignment_statement
-        (variable_list
-          name: (dot_index_expression
-            field: (identifier) @func_decl_start)
-        )
-        (expression_list
-          value: (function_definition)
-        )
-      )@func_node
-    ]],
-  go = [[
-        (function_declaration
-          name: (identifier) @func_decl_start
-        )
-        (method_declaration
-        name: (field_identifier) @func_decl_start
-        )
-      ]],
-  zig = [[
-        (function_declaration
-          name: (identifier) @func_decl_start
-        )
-      ]],
-  fish = [[
-        (function_definition) @func_decl_start
-      ]],
-}
+local QUERY_NAME = 'go_nav_func_decl'
 
 local function get_root_and_query()
   local util_treesitter = require 'go-sparrow.util_treesitter'
   local root, lang = util_treesitter.get_root_and_lang()
-  local query_string = QUERY_STRINGS[lang]
-  if not query_string then
-    return root, nil
-  end
-  local query = util_treesitter.get_cached_query(lang, query_string)
+  local query = util_treesitter.get_cached_query_by_name(lang, QUERY_NAME)
   return root, query
 end
 

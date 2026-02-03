@@ -2,115 +2,24 @@ local M = {}
 
 local cache = {}
 
--- Query strings as constants per language
-local QUERY_STRINGS = {
+local QUERY_NAMES = {
   go = {
-    func_calls = [[
-;; Function calls in short variable declarations (e.g., result, err := func())
-(short_var_declaration
-  left: (expression_list)
-  right: (expression_list
-    (call_expression
-      function: [
-        (identifier) @func_name
-        (selector_expression
-          field: (field_identifier) @func_name)
-      ])))
-
-;; Function calls in assignment statements (e.g., result, err = func())
-(assignment_statement
-  left: (expression_list)
-  right: (expression_list
-    (call_expression
-      function: [
-        (identifier) @func_name
-        (selector_expression
-          field: (field_identifier) @func_name)
-      ])))
-
-;; Chained method calls in assignment statements (e.g., logEntry = logEntry.WithField(...))
-(assignment_statement
-  right: (expression_list
-    (call_expression
-      function: (selector_expression
-        field: (field_identifier) @func_name))))
-]],
-    expressions = [[
-;; Function calls in expression statements (e.g., func())
-(expression_statement
-  (call_expression
-    function: [
-      (identifier) @func_name
-      (selector_expression
-        field: (field_identifier) @func_name)
-    ]))
-
-;; Function calls in go statements (e.g., go func())
-(go_statement
-  (call_expression
-    function: [
-      (identifier) @func_name
-      (selector_expression
-        field: (field_identifier) @func_name)
-    ]))
-
-;; Function calls in return statements (e.g., return func())
-(return_statement
-  (expression_list
-    (call_expression
-      function: [
-        (identifier) @func_name
-        (selector_expression
-          field: (field_identifier) @func_name)
-      ])))
-]],
+    func_calls = 'func_calls',
+    expressions = 'expressions',
   },
   lua = {
-    func_calls = [[
-      (variable_declaration
-        (assignment_statement
-           (variable_list
-	           name: (identifier))
-           (expression_list
-              value:(function_call
-	        	       name: [
-                 (identifier) @func_name
-                 (dot_index_expression
-                   field: (identifier) @func_name)
-                 (method_index_expression
-                   method: (identifier) @func_name)
-               ]
-	        	       )
-           )
-        )
-      )
-      ]],
-    expressions = [[
-          (function_call
-            name: (dot_index_expression
-              table: (_)
-              field: (identifier) @func_name
-          ))
-
-         (function_call
-           name: (identifier) @func_name
-           arguments: (arguments))
-
-         (function_call
-           name: (method_index_expression
-             table: (_)
-             method: (identifier) @func_name))
-      ]],
+    func_calls = 'func_calls',
+    expressions = 'expressions',
   },
 }
 
-local function get_query_strings()
+local function get_query_names()
   local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
-  return lang and QUERY_STRINGS[lang] or nil
+  return lang and QUERY_NAMES[lang] or nil
 end
 
 local function ensure_cache_initialized()
-  local queries = get_query_strings()
+  local queries = get_query_names()
   if queries then
     for query_type, _ in pairs(queries) do
       if not cache[query_type] then
@@ -167,12 +76,12 @@ local function get_cached_matches(query_type)
   end
 
   -- Get new matches using cached query
-  local queries = get_query_strings()
+  local queries = get_query_names()
   if not queries then
     return {}
   end
-  local query_string = queries[query_type]
-  local _, query, root = require('go-sparrow.util_treesitter').get_parser_and_query(query_string)
+  local query_name = queries[query_type]
+  local _, query, root = require('go-sparrow.util_treesitter').get_parser_and_named_query(query_name)
   local matches = {}
   local top_line, bottom_line = require('go-sparrow.util_treesitter').get_visible_range()
 
