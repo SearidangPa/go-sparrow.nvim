@@ -19,9 +19,18 @@ local QUERY_STRINGS = {
       (variable_declaration
         (assignment_statement
            (variable_list
-          	  name: (identifier)) @identifier
+           	  name: (identifier)) @identifier
 	)
       )
+    ]],
+  rust = [[
+      (let_declaration
+        pattern: (identifier) @identifier
+        value: (call_expression))
+
+      (let_declaration
+        pattern: (mut_pattern (identifier) @identifier)
+        value: (call_expression))
     ]],
 }
 

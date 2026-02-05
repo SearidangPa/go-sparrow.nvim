@@ -11,6 +11,10 @@ local QUERY_NAMES = {
     func_calls = 'func_calls',
     expressions = 'expressions',
   },
+  rust = {
+    func_calls = 'func_calls',
+    expressions = 'expressions',
+  },
 }
 
 local function get_query_names()
