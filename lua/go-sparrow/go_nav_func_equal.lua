@@ -75,7 +75,11 @@ local function get_cached_matches(query_type)
   end
 
   -- Return cached results if valid
-  if query_cache.buf_nr == buf_nr and query_cache.changedtick == changedtick and query_cache.matches then
+  if
+    query_cache.buf_nr == buf_nr
+    and query_cache.changedtick == changedtick
+    and query_cache.matches
+  then
     return query_cache.matches
   end
 
@@ -85,9 +89,11 @@ local function get_cached_matches(query_type)
     return {}
   end
   local query_name = queries[query_type]
-  local _, query, root = require('go-sparrow.util_treesitter').get_parser_and_named_query(query_name)
+  local _, query, root =
+    require('go-sparrow.util_treesitter').get_parser_and_named_query(query_name)
   local matches = {}
-  local top_line, bottom_line = require('go-sparrow.util_treesitter').get_visible_range()
+  local top_line, bottom_line =
+    require('go-sparrow.util_treesitter').get_visible_range()
 
   -- Helper function to collect matches from a range
   local function collect_matches(start_line, end_line, skip_visible)
@@ -97,7 +103,11 @@ local function get_cached_matches(query_type)
         local start_row, start_col = node:range()
 
         -- Skip if in visible range when expanding search
-        if skip_visible and start_row >= top_line and start_row <= bottom_line then
+        if
+          skip_visible
+          and start_row >= top_line
+          and start_row <= bottom_line
+        then
           goto continue
         end
 
@@ -202,7 +212,9 @@ local function get_prev_match_text(query_type)
   end
 end
 
-function M.get_prev_func_call_with_equal() return get_prev_match_text 'func_calls' end
+function M.get_prev_func_call_with_equal()
+  return get_prev_match_text 'func_calls'
+end
 
 M.next_function_call = function() move_to_match('func_calls', 'next') end
 M.prev_function_call = function() move_to_match('func_calls', 'prev') end

@@ -8,7 +8,8 @@ function M.get_cached_query(lang, query_string)
     query_cache[lang] = {}
   end
   if not query_cache[lang][query_string] then
-    query_cache[lang][query_string] = vim.treesitter.query.parse(lang, query_string)
+    query_cache[lang][query_string] =
+      vim.treesitter.query.parse(lang, query_string)
   end
   return query_cache[lang][query_string]
 end

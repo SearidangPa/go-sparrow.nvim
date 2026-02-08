@@ -46,7 +46,11 @@ local function get_cached_matches()
   local buf_nr = vim.api.nvim_get_current_buf()
   local changedtick = vim.api.nvim_buf_get_changedtick(buf_nr)
 
-  if cache.buf_nr == buf_nr and cache.changedtick == changedtick and cache.matches then
+  if
+    cache.buf_nr == buf_nr
+    and cache.changedtick == changedtick
+    and cache.matches
+  then
     return cache.matches
   end
 
@@ -54,15 +58,21 @@ local function get_cached_matches()
   if not query_string then
     return {}
   end
-  local _, query, root = require('go-sparrow.util_treesitter').get_parser_and_query(query_string)
+  local _, query, root =
+    require('go-sparrow.util_treesitter').get_parser_and_query(query_string)
   local matches = {}
-  local top_line, bottom_line = require('go-sparrow.util_treesitter').get_visible_range()
+  local top_line, bottom_line =
+    require('go-sparrow.util_treesitter').get_visible_range()
 
   local function process_capture(node, start_line, end_line)
     local identifier_text = vim.treesitter.get_node_text(node, buf_nr)
     if identifier_text ~= 'err' then
       local start_row, start_col = node:range()
-      if not start_line or not end_line or (start_row >= start_line and start_row <= end_line) then
+      if
+        not start_line
+        or not end_line
+        or (start_row >= start_line and start_row <= end_line)
+      then
         table.insert(matches, {
           node = node,
           row = start_row,
