@@ -88,6 +88,7 @@ local function get_current_context()
 
   local parser = parser_or_err
   local ok_tree, tree_or_err = pcall(function()
+    assert(parser, 'Parser not found for ' .. lang)
     local trees = parser:parse()
     return trees and trees[1]
   end)
