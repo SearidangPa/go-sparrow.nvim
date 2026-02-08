@@ -1,8 +1,16 @@
 local M = {}
 
-local QUERY_NAME = 'go_nav_func_decl'
+local DEFAULT_QUERY_NAME = 'go_nav_func_decl'
+local LUA_QUERY_NAME = 'go_nav_range_action'
 local HIGHLIGHT_NS = vim.api.nvim_create_namespace 'go_sparrow_range_action'
 local util_treesitter = require 'go-sparrow.util_treesitter'
+
+local function get_query_name(lang)
+  if lang == 'lua' then
+    return LUA_QUERY_NAME
+  end
+  return DEFAULT_QUERY_NAME
+end
 
 local function notify_warn(message)
   vim.schedule(function() vim.notify(message, vim.log.levels.WARN) end)
@@ -103,13 +111,14 @@ local function get_current_context()
     return nil
   end
 
-  local ok_query, query_or_err = pcall(
-    function() return util_treesitter.get_cached_query_by_name(lang, QUERY_NAME) end
-  )
+  local query_name = get_query_name(lang)
+  local ok_query, query_or_err = pcall(function()
+    return util_treesitter.get_cached_query_by_name(lang, query_name)
+  end)
   if not ok_query then
     notify_warn(
       ('treesitter: query %s unavailable for %s (%s)'):format(
-        QUERY_NAME,
+        query_name,
         lang,
         tostring(query_or_err)
       )
