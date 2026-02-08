@@ -32,6 +32,5 @@ M.prev_expression = function()
   return require('go-sparrow.go_nav_func_equal').prev_expression()
 end
 
-M.setup = function() end
 
 return M
