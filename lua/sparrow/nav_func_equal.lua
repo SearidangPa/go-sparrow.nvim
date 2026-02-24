@@ -90,10 +90,10 @@ local function get_cached_matches(query_type)
   end
   local query_name = queries[query_type]
   local _, query, root =
-    require('go-sparrow.util_treesitter').get_parser_and_named_query(query_name)
+    require('sparrow.util_treesitter').get_parser_and_named_query(query_name)
   local matches = {}
   local top_line, bottom_line =
-    require('go-sparrow.util_treesitter').get_visible_range()
+    require('sparrow.util_treesitter').get_visible_range()
 
   -- Helper function to collect matches from a range
   local function collect_matches(start_line, end_line, skip_visible)

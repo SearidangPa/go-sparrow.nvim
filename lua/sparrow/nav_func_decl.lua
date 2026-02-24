@@ -1,9 +1,9 @@
 local M = {}
 
-local QUERY_NAME = 'go_nav_func_decl'
+local QUERY_NAME = 'nav_func_decl'
 
 local function get_root_and_query()
-  local util_treesitter = require 'go-sparrow.util_treesitter'
+  local util_treesitter = require 'sparrow.util_treesitter'
   local root, lang = util_treesitter.get_root_and_lang()
   local query = util_treesitter.get_cached_query_by_name(lang, QUERY_NAME)
   return root, query
@@ -94,7 +94,6 @@ M.next_func_declaration = function(opts)
     if next_node then
       local start_row, start_col, _, _ = next_node:range()
       vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
-      current_row = start_row
     end
   end
 end
@@ -109,7 +108,7 @@ M.find_prev_func_declaration = function(
 )
   outer_most = outer_most or false
   local top_line, bottom_line =
-    require('go-sparrow.util_treesitter').get_visible_range()
+    require('sparrow.util_treesitter').get_visible_range()
   local previous_node = nil
 
   -- First search in visible range
@@ -190,7 +189,6 @@ M.prev_func_declaration = function(opts)
     if previous_node then
       local start_row, start_col, _, _ = previous_node:range()
       vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
-      current_row = start_row
     end
   end
 end

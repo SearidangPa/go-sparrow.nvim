@@ -18,9 +18,9 @@ local QUERY_STRINGS = {
   lua = [[
       (variable_declaration
         (assignment_statement
-           (variable_list
-           	  name: (identifier)) @identifier
-	)
+          (variable_list
+            name: (identifier)) @identifier
+        )
       )
     ]],
   rust = [[
@@ -59,10 +59,10 @@ local function get_cached_matches()
     return {}
   end
   local _, query, root =
-    require('go-sparrow.util_treesitter').get_parser_and_query(query_string)
+    require('sparrow.util_treesitter').get_parser_and_query(query_string)
   local matches = {}
   local top_line, bottom_line =
-    require('go-sparrow.util_treesitter').get_visible_range()
+    require('sparrow.util_treesitter').get_visible_range()
 
   local function process_capture(node, start_line, end_line)
     local identifier_text = vim.treesitter.get_node_text(node, buf_nr)

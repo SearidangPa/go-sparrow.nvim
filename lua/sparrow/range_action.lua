@@ -1,9 +1,9 @@
 local M = {}
 
-local DEFAULT_QUERY_NAME = 'go_nav_func_decl'
-local LUA_QUERY_NAME = 'go_nav_range_action'
-local HIGHLIGHT_NS = vim.api.nvim_create_namespace 'go_sparrow_range_action'
-local util_treesitter = require 'go-sparrow.util_treesitter'
+local DEFAULT_QUERY_NAME = 'nav_func_decl'
+local LUA_QUERY_NAME = 'nav_range_action'
+local HIGHLIGHT_NS = vim.api.nvim_create_namespace 'sparrow_range_action'
+local util_treesitter = require 'sparrow.util_treesitter'
 
 local function get_query_name(lang)
   if lang == 'lua' then
@@ -24,15 +24,15 @@ end
 local function is_function_like_node(lang, node_type)
   if lang == 'lua' then
     return node_type == 'function_declaration'
-        or node_type == 'function_definition'
-        or node_type == 'assignment_statement'
-        or node_type == 'variable_declaration'
+      or node_type == 'function_definition'
+      or node_type == 'assignment_statement'
+      or node_type == 'variable_declaration'
   end
 
   if lang == 'go' then
     return node_type == 'function_declaration'
-        or node_type == 'method_declaration'
-        or node_type == 'func_literal'
+      or node_type == 'method_declaration'
+      or node_type == 'func_literal'
   end
 
   if lang == 'fish' then
@@ -41,8 +41,8 @@ local function is_function_like_node(lang, node_type)
 
   if lang == 'rust' then
     return node_type == 'function_item'
-        or node_type == 'function_signature_item'
-        or node_type == 'closure_expression'
+      or node_type == 'function_signature_item'
+      or node_type == 'closure_expression'
   end
 
   if lang == 'zig' then
@@ -50,7 +50,7 @@ local function is_function_like_node(lang, node_type)
   end
 
   return node_type:find('function', 1, true) ~= nil
-      or node_type:find('method', 1, true) ~= nil
+    or node_type:find('method', 1, true) ~= nil
 end
 
 local function resolve_function_node(lang, capture_node, root)
@@ -113,9 +113,9 @@ local function get_current_context()
   end
 
   local query_name = get_query_name(lang)
-  local ok_query, query_or_err = pcall(function()
-    return util_treesitter.get_cached_query_by_name(lang, query_name)
-  end)
+  local ok_query, query_or_err = pcall(
+    function() return util_treesitter.get_cached_query_by_name(lang, query_name) end
+  )
   if not ok_query then
     notify_warn(
       ('treesitter: query %s unavailable for %s (%s)'):format(
@@ -140,7 +140,7 @@ local function find_enclosing_function(context, line)
   local current_start_row = -1
 
   for id, node in
-  context.query:iter_captures(context.root, context.bufnr, 0, -1)
+    context.query:iter_captures(context.root, context.bufnr, 0, -1)
   do
     local capture_name = context.query.captures[id]
     local candidate = nil
@@ -183,7 +183,7 @@ end
 
 local function get_function_name(context)
   for id, node in
-  context.query:iter_captures(context.node, context.bufnr, 0, -1)
+    context.query:iter_captures(context.node, context.bufnr, 0, -1)
   do
     if context.query.captures[id] == 'func_decl_start' then
       return vim.treesitter.get_node_text(node, context.bufnr)
@@ -193,9 +193,9 @@ local function get_function_name(context)
   for child in context.node:iter_children() do
     local child_type = child:type()
     if
-        child_type == 'identifier'
-        or child_type == 'name'
-        or child_type == 'field_identifier'
+      child_type == 'identifier'
+      or child_type == 'name'
+      or child_type == 'field_identifier'
     then
       return vim.treesitter.get_node_text(child, context.bufnr)
     end
@@ -255,6 +255,5 @@ M.delete_function = function()
   M.visual_function()
   vim.cmd 'normal! d'
 end
-
 
 return M
