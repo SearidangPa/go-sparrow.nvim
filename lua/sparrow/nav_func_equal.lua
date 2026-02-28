@@ -63,6 +63,73 @@ local ignore_list = {
   make = true,
 }
 
+local function unwrap_to_call_expression(node)
+  local current = node
+
+  for _ = 1, 4 do
+    if not current then
+      return nil
+    end
+
+    local node_type = current:type()
+    if node_type == 'call_expression' then
+      return current
+    end
+
+    if
+      node_type == 'await_expression'
+      or node_type == 'try_expression'
+      or node_type == 'parenthesized_expression'
+    then
+      current = current:named_child(0)
+    else
+      return nil
+    end
+  end
+
+  return nil
+end
+
+local function resolve_func_name_node(node)
+  local current = node
+
+  for _ = 1, 12 do
+    if not current then
+      return node
+    end
+
+    local node_type = current:type()
+    if node_type == 'identifier' or node_type == 'field_identifier' then
+      return current
+    end
+
+    local next_node
+    if node_type == 'scoped_identifier' then
+      next_node = current:field('name')[1]
+    elseif node_type == 'field_expression' then
+      local value_node = current:field('value')[1]
+      local value_call = unwrap_to_call_expression(value_node)
+      if value_call then
+        next_node = value_call:field('function')[1]
+      else
+        next_node = current:field('field')[1]
+      end
+    elseif node_type == 'generic_function' then
+      next_node = current:field('function')[1]
+    else
+      return current
+    end
+
+    if not next_node then
+      return current
+    end
+
+    current = next_node
+  end
+
+  return current or node
+end
+
 local function get_cached_matches(query_type)
   ensure_cache_initialized()
 
@@ -92,6 +159,7 @@ local function get_cached_matches(query_type)
   local _, query, root =
     require('sparrow.util_treesitter').get_parser_and_named_query(query_name)
   local matches = {}
+  local seen_positions = {}
   local top_line, bottom_line =
     require('sparrow.util_treesitter').get_visible_range()
 
@@ -100,7 +168,8 @@ local function get_cached_matches(query_type)
     for id, node, _ in query:iter_captures(root, buf_nr, start_line, end_line) do
       local capture_name = query.captures[id]
       if capture_name == 'func_name' then
-        local start_row, start_col = node:range()
+        local name_node = resolve_func_name_node(node)
+        local start_row, start_col = name_node:range()
 
         -- Skip if in visible range when expanding search
         if
@@ -111,14 +180,18 @@ local function get_cached_matches(query_type)
           goto continue
         end
 
-        local func_name = vim.treesitter.get_node_text(node, buf_nr)
+        local func_name = vim.treesitter.get_node_text(name_node, buf_nr)
         if not ignore_list[func_name] then
-          table.insert(matches, {
-            node = node,
-            row = start_row,
-            col = start_col,
-            name = func_name,
-          })
+          local key = string.format('%d:%d', start_row, start_col)
+          if not seen_positions[key] then
+            seen_positions[key] = true
+            table.insert(matches, {
+              node = name_node,
+              row = start_row,
+              col = start_col,
+              name = func_name,
+            })
+          end
         end
         ::continue::
       end

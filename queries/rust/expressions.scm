@@ -3,70 +3,34 @@
     (call_expression
       function: [
         (identifier) @func_name
-        (scoped_identifier
-          name: (identifier) @func_name)
-        (field_expression
-          field: (field_identifier) @func_name)
-        (generic_function
-          function: (identifier) @func_name)
-        (generic_function
-          function: (scoped_identifier
-            name: (identifier) @func_name))
-        (generic_function
-          function: (field_expression
-            field: (field_identifier) @func_name))
+        (scoped_identifier) @func_name
+        (field_expression) @func_name
+        (generic_function) @func_name
       ])
     (try_expression
       (call_expression
         function: [
           (identifier) @func_name
-          (scoped_identifier
-            name: (identifier) @func_name)
-          (field_expression
-            field: (field_identifier) @func_name)
-          (generic_function
-            function: (identifier) @func_name)
-          (generic_function
-            function: (scoped_identifier
-              name: (identifier) @func_name))
-          (generic_function
-            function: (field_expression
-              field: (field_identifier) @func_name))
+          (scoped_identifier) @func_name
+          (field_expression) @func_name
+          (generic_function) @func_name
         ]))
     (await_expression
       (call_expression
         function: [
           (identifier) @func_name
-          (scoped_identifier
-            name: (identifier) @func_name)
-          (field_expression
-            field: (field_identifier) @func_name)
-          (generic_function
-            function: (identifier) @func_name)
-          (generic_function
-            function: (scoped_identifier
-              name: (identifier) @func_name))
-          (generic_function
-            function: (field_expression
-              field: (field_identifier) @func_name))
+          (scoped_identifier) @func_name
+          (field_expression) @func_name
+          (generic_function) @func_name
         ]))
     (try_expression
       (await_expression
         (call_expression
           function: [
             (identifier) @func_name
-            (scoped_identifier
-              name: (identifier) @func_name)
-            (field_expression
-              field: (field_identifier) @func_name)
-            (generic_function
-              function: (identifier) @func_name)
-            (generic_function
-              function: (scoped_identifier
-                name: (identifier) @func_name))
-            (generic_function
-              function: (field_expression
-                field: (field_identifier) @func_name))
+            (scoped_identifier) @func_name
+            (field_expression) @func_name
+            (generic_function) @func_name
           ])))
     (call_expression
       function: (field_expression
@@ -74,18 +38,9 @@
           (call_expression
             function: [
               (identifier) @func_name
-              (scoped_identifier
-                name: (identifier) @func_name)
-              (field_expression
-                field: (field_identifier) @func_name)
-              (generic_function
-                function: (identifier) @func_name)
-              (generic_function
-                function: (scoped_identifier
-                  name: (identifier) @func_name))
-              (generic_function
-                function: (field_expression
-                  field: (field_identifier) @func_name))
+              (scoped_identifier) @func_name
+              (field_expression) @func_name
+              (generic_function) @func_name
             ]))))
     (try_expression
       (call_expression
@@ -94,18 +49,9 @@
             (call_expression
               function: [
                 (identifier) @func_name
-                (scoped_identifier
-                  name: (identifier) @func_name)
-                (field_expression
-                  field: (field_identifier) @func_name)
-                (generic_function
-                  function: (identifier) @func_name)
-                (generic_function
-                  function: (scoped_identifier
-                    name: (identifier) @func_name))
-                (generic_function
-                  function: (field_expression
-                    field: (field_identifier) @func_name))
+                (scoped_identifier) @func_name
+                (field_expression) @func_name
+                (generic_function) @func_name
               ])))))
   ])
 
@@ -114,70 +60,34 @@
     (call_expression
       function: [
         (identifier) @func_name
-        (scoped_identifier
-          name: (identifier) @func_name)
-        (field_expression
-          field: (field_identifier) @func_name)
-        (generic_function
-          function: (identifier) @func_name)
-        (generic_function
-          function: (scoped_identifier
-            name: (identifier) @func_name))
-        (generic_function
-          function: (field_expression
-            field: (field_identifier) @func_name))
+        (scoped_identifier) @func_name
+        (field_expression) @func_name
+        (generic_function) @func_name
       ])
     (try_expression
       (call_expression
         function: [
           (identifier) @func_name
-          (scoped_identifier
-            name: (identifier) @func_name)
-          (field_expression
-            field: (field_identifier) @func_name)
-          (generic_function
-            function: (identifier) @func_name)
-          (generic_function
-            function: (scoped_identifier
-              name: (identifier) @func_name))
-          (generic_function
-            function: (field_expression
-              field: (field_identifier) @func_name))
+          (scoped_identifier) @func_name
+          (field_expression) @func_name
+          (generic_function) @func_name
         ]))
     (await_expression
       (call_expression
         function: [
           (identifier) @func_name
-          (scoped_identifier
-            name: (identifier) @func_name)
-          (field_expression
-            field: (field_identifier) @func_name)
-          (generic_function
-            function: (identifier) @func_name)
-          (generic_function
-            function: (scoped_identifier
-              name: (identifier) @func_name))
-          (generic_function
-            function: (field_expression
-              field: (field_identifier) @func_name))
+          (scoped_identifier) @func_name
+          (field_expression) @func_name
+          (generic_function) @func_name
         ]))
     (try_expression
       (await_expression
         (call_expression
           function: [
             (identifier) @func_name
-            (scoped_identifier
-              name: (identifier) @func_name)
-            (field_expression
-              field: (field_identifier) @func_name)
-            (generic_function
-              function: (identifier) @func_name)
-            (generic_function
-              function: (scoped_identifier
-                name: (identifier) @func_name))
-            (generic_function
-              function: (field_expression
-                field: (field_identifier) @func_name))
+            (scoped_identifier) @func_name
+            (field_expression) @func_name
+            (generic_function) @func_name
           ])))
     (call_expression
       function: (field_expression
@@ -185,18 +95,9 @@
           (call_expression
             function: [
               (identifier) @func_name
-              (scoped_identifier
-                name: (identifier) @func_name)
-              (field_expression
-                field: (field_identifier) @func_name)
-              (generic_function
-                function: (identifier) @func_name)
-              (generic_function
-                function: (scoped_identifier
-                  name: (identifier) @func_name))
-              (generic_function
-                function: (field_expression
-                  field: (field_identifier) @func_name))
+              (scoped_identifier) @func_name
+              (field_expression) @func_name
+              (generic_function) @func_name
             ]))))
     (try_expression
       (call_expression
@@ -205,18 +106,9 @@
             (call_expression
               function: [
                 (identifier) @func_name
-                (scoped_identifier
-                  name: (identifier) @func_name)
-                (field_expression
-                  field: (field_identifier) @func_name)
-                (generic_function
-                  function: (identifier) @func_name)
-                (generic_function
-                  function: (scoped_identifier
-                    name: (identifier) @func_name))
-                (generic_function
-                  function: (field_expression
-                    field: (field_identifier) @func_name))
+                (scoped_identifier) @func_name
+                (field_expression) @func_name
+                (generic_function) @func_name
               ])))))
   ])
 
@@ -225,70 +117,34 @@
     (call_expression
       function: [
         (identifier) @func_name
-        (scoped_identifier
-          name: (identifier) @func_name)
-        (field_expression
-          field: (field_identifier) @func_name)
-        (generic_function
-          function: (identifier) @func_name)
-        (generic_function
-          function: (scoped_identifier
-            name: (identifier) @func_name))
-        (generic_function
-          function: (field_expression
-            field: (field_identifier) @func_name))
+        (scoped_identifier) @func_name
+        (field_expression) @func_name
+        (generic_function) @func_name
       ])
     (try_expression
       (call_expression
         function: [
           (identifier) @func_name
-          (scoped_identifier
-            name: (identifier) @func_name)
-          (field_expression
-            field: (field_identifier) @func_name)
-          (generic_function
-            function: (identifier) @func_name)
-          (generic_function
-            function: (scoped_identifier
-              name: (identifier) @func_name))
-          (generic_function
-            function: (field_expression
-              field: (field_identifier) @func_name))
+          (scoped_identifier) @func_name
+          (field_expression) @func_name
+          (generic_function) @func_name
         ]))
     (await_expression
       (call_expression
         function: [
           (identifier) @func_name
-          (scoped_identifier
-            name: (identifier) @func_name)
-          (field_expression
-            field: (field_identifier) @func_name)
-          (generic_function
-            function: (identifier) @func_name)
-          (generic_function
-            function: (scoped_identifier
-              name: (identifier) @func_name))
-          (generic_function
-            function: (field_expression
-              field: (field_identifier) @func_name))
+          (scoped_identifier) @func_name
+          (field_expression) @func_name
+          (generic_function) @func_name
         ]))
     (try_expression
       (await_expression
         (call_expression
           function: [
             (identifier) @func_name
-            (scoped_identifier
-              name: (identifier) @func_name)
-            (field_expression
-              field: (field_identifier) @func_name)
-            (generic_function
-              function: (identifier) @func_name)
-            (generic_function
-              function: (scoped_identifier
-                name: (identifier) @func_name))
-            (generic_function
-              function: (field_expression
-                field: (field_identifier) @func_name))
+            (scoped_identifier) @func_name
+            (field_expression) @func_name
+            (generic_function) @func_name
           ])))
     (call_expression
       function: (field_expression
@@ -296,18 +152,9 @@
           (call_expression
             function: [
               (identifier) @func_name
-              (scoped_identifier
-                name: (identifier) @func_name)
-              (field_expression
-                field: (field_identifier) @func_name)
-              (generic_function
-                function: (identifier) @func_name)
-              (generic_function
-                function: (scoped_identifier
-                  name: (identifier) @func_name))
-              (generic_function
-                function: (field_expression
-                  field: (field_identifier) @func_name))
+              (scoped_identifier) @func_name
+              (field_expression) @func_name
+              (generic_function) @func_name
             ]))))
     (try_expression
       (call_expression
@@ -316,17 +163,8 @@
             (call_expression
               function: [
                 (identifier) @func_name
-                (scoped_identifier
-                  name: (identifier) @func_name)
-                (field_expression
-                  field: (field_identifier) @func_name)
-                (generic_function
-                  function: (identifier) @func_name)
-                (generic_function
-                  function: (scoped_identifier
-                    name: (identifier) @func_name))
-                (generic_function
-                  function: (field_expression
-                    field: (field_identifier) @func_name))
+                (scoped_identifier) @func_name
+                (field_expression) @func_name
+                (generic_function) @func_name
               ])))))
   ])
