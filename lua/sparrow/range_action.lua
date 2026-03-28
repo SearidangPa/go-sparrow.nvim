@@ -64,6 +64,7 @@ M.visual_function = function()
   vim.api.nvim_win_set_cursor(0, { ctx.start_row + 1, 0 })
   vim.cmd 'normal! V'
   vim.api.nvim_win_set_cursor(0, { ctx.end_row + 1, 0 })
+  vim.cmd 'normal! o'
 end
 
 M.delete_function = function()
